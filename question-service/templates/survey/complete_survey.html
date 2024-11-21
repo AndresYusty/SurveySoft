@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completar Encuesta</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #6c63ff;
+            color: white;
+        }
+        .submit-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ survey.name }}</h1>
+        <form method="POST">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ítem</th>
+                        <th>Descripción</th>
+                        <th>Valor (0-3)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for section in survey.sections %}
+                        <tr>
+                            <td colspan="3" style="font-weight: bold; background-color: #f4f4f9;">{{ section.section_title }}</td>
+                        </tr>
+                        {% for item in section.items %}
+                            <tr>
+                                <td>{{ item.item_name }}</td>
+                                <td>{{ item.description }}</td>
+                                <td>
+                                    <input type="number" name="item_{{ item.id }}" min="0" max="3" required>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="submit-btn">Enviar Resultados</button>
+        </form>
+    </div>
+</body>
+</html>

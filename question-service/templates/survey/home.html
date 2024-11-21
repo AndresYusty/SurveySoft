@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Encuestas{% endblock %}
+
+{% block content %}
+<h2>Encuestas Disponibles</h2>
+
+<ul>
+    {% for survey in surveys %}
+        <li>
+            {{ survey.name }}
+            <a href="/question/surveys/{{ survey.id }}/administer" class="button">Administrar</a>
+        </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

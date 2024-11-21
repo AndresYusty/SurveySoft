@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de la Encuesta</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .overall-summary {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        .btn {
+            display: inline-block;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Resultados de la Encuesta</h1>
+        <h2>Formulario: {{ form.software_name }}</h2>
+        <p><strong>Ciudad:</strong> {{ form.city }}</p>
+        <p><strong>Compañía:</strong> {{ form.company }}</p>
+        <p><strong>Objetivos Generales:</strong> {{ form.general_objectives }}</p>
+        <p><strong>Objetivos Específicos:</strong> {{ form.specific_objectives }}</p>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>CÓDIGO</th>
+                        <th>ÍTEM</th>
+                        <th>DESCRIPCIÓN<br><small>condición de Normalidad</small></th>
+                        <th>VALOR</th>
+                        <th>MÁXIMO</th>
+                        <th>% RESULTADO</th>
+                        <th>MÁXIMO %</th>
+                        <th>% GLOBAL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ result.item_name }}</td>
+                        <td class="description">{{ result.description }}</td>
+                        <td>{{ result.value }}</td>
+                        <td>15</td> <!-- Ajustar el máximo según tu lógica -->
+                        <td>{{ result.percentage }}%</td>
+                        <td>14%</td> <!-- Ajustar el máximo % según tu lógica -->
+                        <td>{{ result.percentage * 0.14 | round(2) }}%</td> <!-- Cálculo ejemplo -->
+                    </tr>
+                    {% endfor %}
+                    <tr class="total-row">
+                        <td colspan="3">TOTAL PUNTAJE</td>
+                        <td>{{ total_score }}</td>
+                        <td>{{ total_max }}</td>
+                        <td>100,00%</td>
+                        <td>100%</td>
+                        <td class="highlight">{{ overall_percentage }}%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="overall-summary">
+            <p><strong>Puntaje Total:</strong> {{ total_score }} / {{ total_max }}</p>
+            <p><strong>Porcentaje General:</strong> {{ overall_percentage }}%</p>
+            <p><strong>Resultado General:</strong> {{ overall_result }}</p>
+        </div>
+
+        <a href="{{ url_for('question.surveys') }}" class="btn">Volver a Encuestas</a>
+    </div>
+</body>
+</html>

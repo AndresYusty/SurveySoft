@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Crear Encuesta</h2>
+<form method="post">
+    <div>
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" name="name" required>
+    </div>
+    <div>
+        <label for="description">Descripción:</label>
+        <textarea id="description" name="description"></textarea>
+    </div>
+    <button type="submit">Guardar</button>
+</form>
+{% endblock %}
