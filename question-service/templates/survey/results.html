@@ -1,144 +1,183 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultados de la Encuesta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
             margin: 0;
             padding: 0;
+            color: #212529;
         }
 
         .container {
             max-width: 900px;
-            margin: 20px auto;
-            background: #fff;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         h1, h2 {
-            color: #333;
             text-align: center;
+            color: #343a40;
+            margin-bottom: 1rem;
         }
 
-        h1 {
-            margin-bottom: 10px;
-        }
-
-        h2 {
-            margin-top: 20px;
-            font-size: 1.5em;
+        p {
+            margin: 0.5rem 0;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin-top: 1rem;
         }
 
-        table th, table td {
-            padding: 12px;
-            text-align: left;
-            border: 1px solid #ddd;
+        table, th, td {
+            border: 1px solid #dee2e6;
         }
 
-        table th {
+        th {
             background-color: #007bff;
             color: white;
+            text-align: center;
+            padding: 10px;
+        }
+
+        td {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .highlight {
+            font-weight: bold;
+            background-color: #f8f9fa;
+        }
+
+        .summary {
+            margin-top: 2rem;
+            font-size: 1rem;
+        }
+
+        .summary span {
             font-weight: bold;
         }
 
-        table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .overall-summary {
-            margin-top: 20px;
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border-radius: 4px;
-            font-size: 1.2em;
+        .result-level {
+            margin-top: 2rem;
             text-align: center;
+            font-weight: bold;
+            font-size: 1.5rem;
         }
 
-        .btn {
-            display: inline-block;
-            margin: 20px 0;
+        .result-level span {
+            font-size: 1.2rem;
+        }
+
+        .result-level .deficiente {
+            color: red;
+        }
+
+        .result-level .insuficiente {
+            color: orange;
+        }
+
+        .result-level .aceptable {
+            color: #ffc107;
+        }
+
+        .result-level .sobresaliente {
+            color: #28a745;
+        }
+
+        .result-level .excelente {
+            color: #007bff;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .btn-back {
+            display: block;
+            width: fit-content;
+            margin: 2rem auto;
             padding: 10px 20px;
-            background-color: #28a745;
+            text-align: center;
+            background-color: #007bff;
             color: white;
             text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-            text-align: center;
+            border-radius: 5px;
         }
 
-        .btn:hover {
-            background-color: #218838;
+        .btn-back:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Resultados de la Encuesta</h1>
-        <h2>Formulario: {{ form.software_name }}</h2>
-        <p><strong>Ciudad:</strong> {{ form.city }}</p>
-        <p><strong>Compañía:</strong> {{ form.company }}</p>
-        <p><strong>Objetivos Generales:</strong> {{ form.general_objectives }}</p>
-        <p><strong>Objetivos Específicos:</strong> {{ form.specific_objectives }}</p>
+        <h2>{{ form.software_name or "N/A" }}</h2>
+        <p><strong>Empresa:</strong> {{ form.company or "N/A" }}</p>
+        <p><strong>Ciudad:</strong> {{ form.city or "N/A" }}</p>
+        <p><strong>Teléfono:</strong> {{ form.phone or "N/A" }}</p>
+        <p><strong>Objetivos Generales:</strong> {{ form.general_objectives or "N/A" }}</p>
+        <p><strong>Objetivos Específicos:</strong> {{ form.specific_objectives or "N/A" }}</p>
 
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>CÓDIGO</th>
-                        <th>ÍTEM</th>
-                        <th>DESCRIPCIÓN<br><small>condición de Normalidad</small></th>
-                        <th>VALOR</th>
-                        <th>MÁXIMO</th>
-                        <th>% RESULTADO</th>
-                        <th>MÁXIMO %</th>
-                        <th>% GLOBAL</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for result in results %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td>{{ result.item_name }}</td>
-                        <td class="description">{{ result.description }}</td>
-                        <td>{{ result.value }}</td>
-                        <td>15</td> <!-- Ajustar el máximo según tu lógica -->
-                        <td>{{ result.percentage }}%</td>
-                        <td>14%</td> <!-- Ajustar el máximo % según tu lógica -->
-                        <td>{{ result.percentage * 0.14 | round(2) }}%</td> <!-- Cálculo ejemplo -->
-                    </tr>
-                    {% endfor %}
-                    <tr class="total-row">
-                        <td colspan="3">TOTAL PUNTAJE</td>
-                        <td>{{ total_score }}</td>
-                        <td>{{ total_max }}</td>
-                        <td>100,00%</td>
-                        <td>100%</td>
-                        <td class="highlight">{{ overall_percentage }}%</td>
-                    </tr>
-                </tbody>
-            </table>
+        <h3>Resultados</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Sección</th>
+                    <th>Pregunta</th>
+                    <th>Descripción</th>
+                    <th>Valor</th>
+                    <th>Máximo</th>
+                    <th>Porcentaje</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>{{ result.section_title or "N/A" }}</td>
+                    <td>{{ result.item_name or "N/A" }}</td>
+                    <td>{{ result.description or "N/A" }}</td>
+                    <td>{{ result.value or 0 }}</td>
+                    <td>{{ result.max_value or 0 }}</td>
+                    <td>{{ result.percentage or 0 }}%</td>
+                </tr>
+                {% endfor %}
+                <tr class="highlight">
+                    <td colspan="3">TOTAL PUNTAJE</td>
+                    <td>{{ total_score or 0 }}</td>
+                    <td>{{ total_max or 0 }}</td>
+                    <td>{{ overall_percentage or 0 }}%</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="result-level">
+            Resultado General: 
+            <span class="{% if overall_percentage <= 30 %}deficiente{% elif overall_percentage <= 50 %}insuficiente{% elif overall_percentage <= 70 %}aceptable{% elif overall_percentage <= 89 %}sobresaliente{% else %}excelente{% endif %}">
+                {{ overall_result or "N/A" }}
+            </span>
         </div>
 
-        <div class="overall-summary">
-            <p><strong>Puntaje Total:</strong> {{ total_score }} / {{ total_max }}</p>
-            <p><strong>Porcentaje General:</strong> {{ overall_percentage }}%</p>
-            <p><strong>Resultado General:</strong> {{ overall_result }}</p>
-        </div>
+        <a href="{{ url_for('question.surveys') }}" class="btn-back">Volver a Encuestas</a>
 
-        <a href="{{ url_for('question.surveys') }}" class="btn">Volver a Encuestas</a>
+        <footer>
+            <p>&copy; 2024 Calidad Software. Todos los derechos reservados.</p>
+        </footer>
     </div>
 </body>
 </html>

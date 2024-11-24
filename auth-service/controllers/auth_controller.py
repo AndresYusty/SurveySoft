@@ -32,13 +32,17 @@ def admin_dashboard():
         return redirect(url_for('auth.login'))
     return render_template('auth/admin_dashboard.html', username=session['username'])
 
-# Ruta para el dashboard de usuario
 @auth_bp.route('/user/dashboard')
 def user_dashboard():
     if 'role' not in session or session['role'] != 'user':
         flash("No tienes permiso para acceder a esta página.")
         return redirect(url_for('auth.login'))
-    return render_template('auth/dashboard.html', username=session['username'])
+    return render_template(
+        'auth/dashboard.html',
+        username=session['username'],
+        user_id=session['user_id']  # Pasa el user_id a la plantilla
+    )
+
 
 # Ruta para el registro
 @auth_bp.route('/register', methods=['GET', 'POST'])

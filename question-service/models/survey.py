@@ -35,9 +35,12 @@ class SurveyItem(Base):
 
     id = Column(Integer, primary_key=True)
     section_id = Column(Integer, ForeignKey('survey_section.id', ondelete="CASCADE"))
+    code = Column(String(50), nullable=True)  # Código único para cada pregunta
     item_name = Column(String(255))
     description = Column(Text)
     value = Column(Integer, default=0)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
     # Relaciones
     section = relationship('SurveySection', back_populates='items')
@@ -52,7 +55,7 @@ class SurveyResults(Base):
     survey_id = Column(Integer, ForeignKey("survey.id"), nullable=False)
     item_id = Column(Integer, ForeignKey("survey_item.id"), nullable=True)
     total_score = Column(Integer, nullable=False)
-    percentage = Column(Float, nullable=False)
+    percentage = Column(Float(3, 1), nullable=False)
     overall_result = Column(String(255), nullable=False)
     response_id = Column(String(36), nullable=False, unique=True, default=lambda: str(uuid.uuid4()))  # UUID
     form_id = Column(Integer, ForeignKey("evaluation_forms.id"), nullable=False)  # Relación con el formulario
@@ -70,7 +73,7 @@ class SurveyResponse(Base):
     survey_id = Column(Integer, ForeignKey('survey.id', ondelete="CASCADE"), nullable=False)
     user_id = Column(Integer, nullable=False)
     item_id = Column(Integer, ForeignKey('survey_item.id', ondelete="CASCADE"), nullable=False)
-    value = Column(Float, nullable=False)
+    value = Column(Float(3, 1), nullable=True)  # Permitir nulo para respuestas en blanco
 
     # Relaciones
     survey = relationship("Survey")
@@ -88,6 +91,7 @@ class EvaluationForm(Base):
     software_name = Column(String(255), nullable=False)
     general_objectives = Column(String(500), nullable=False)
     specific_objectives = Column(String(500), nullable=False)
+    created_at = Column(DateTime, default=func.now())
 
     # Relación con SurveyResults
     results = relationship("SurveyResults", back_populates="form")
