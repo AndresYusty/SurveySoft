@@ -336,7 +336,7 @@ def administer_survey(survey_id):
 
 
 
-@question_bp.route('/surveys/<int:survey_id>/questions/create', methods=['GET', 'POST'])
+@question_bp.route('/surveys/<int:survey_id>/questions/new', methods=['GET', 'POST'])
 def create_question(survey_id):
     """
     Crear una nueva pregunta para una encuesta.
@@ -344,18 +344,12 @@ def create_question(survey_id):
     session_db = SessionLocal()
     try:
         if request.method == 'POST':
+            # Obtener datos del formulario
             item_name = request.form['item_name']
             description = request.form['description']
             section_id = request.form['section_id']
 
-            # Validación: Verificar si la sección existe
-            section = session_db.query(SurveySection).filter(SurveySection.id == section_id, SurveySection.survey_id == survey_id).one_or_none()
-            if not section:
-                flash("Sección no válida para esta encuesta.", "error")
-                current_app.logger.warning(f"Intento de crear pregunta en una sección no válida: {section_id}")
-                return redirect(url_for('question.create_question', survey_id=survey_id))
-
-            # Crear y guardar la pregunta
+            # Crear una nueva pregunta
             question = SurveyItem(
                 item_name=item_name,
                 description=description,
@@ -365,18 +359,18 @@ def create_question(survey_id):
             session_db.commit()
 
             flash("Pregunta creada exitosamente.", "success")
-            current_app.logger.info(f"Pregunta creada exitosamente para la encuesta {survey_id}: {item_name}")
             return redirect(url_for('question.administer_survey', survey_id=survey_id))
 
-        # Obtener secciones de la encuesta para asignar la pregunta a una sección
+        # Obtener secciones de la encuesta para asignar la pregunta
         sections = session_db.query(SurveySection).filter(SurveySection.survey_id == survey_id).all()
-        return render_template('survey/create_question.html', sections=sections, survey_id=survey_id)
+        return render_template('survey/new_question.html', sections=sections, survey_id=survey_id)
     except Exception as e:
         current_app.logger.error(f"Error al crear una pregunta para la encuesta con ID {survey_id}: {e}")
         flash("Hubo un error al crear la pregunta.", "error")
         return redirect(url_for('question.administer_survey', survey_id=survey_id))
     finally:
         session_db.close()
+
 
 
 @question_bp.route('/surveys/<int:survey_id>/questions/<int:question_id>/edit', methods=['GET', 'POST'])
