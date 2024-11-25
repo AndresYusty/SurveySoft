@@ -10,8 +10,11 @@ from services.survey_service import (
 )
 from database import SessionLocal
 from models.survey import SurveyResults, SurveyResponse
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.pdfgen import canvas
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer , Image, PageBreak
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
 from io import BytesIO
 from uuid import uuid4
 from sqlalchemy.sql import func
@@ -158,11 +161,18 @@ def complete_survey_view(survey_id):
     finally:
         session_db.close()
 
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import (
+    SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+)
+from reportlab.lib.styles import getSampleStyleSheet
+from io import BytesIO
+
 @question_bp.route('/surveys/<int:survey_id>/results/pdf', methods=['GET'])
 def download_survey_results_pdf(survey_id):
     """
-    Genera un PDF con los resultados de la encuesta, incluyendo descripciones y resultados generales,
-    aplicando un filtro para evitar respuestas duplicadas.
+    Genera un PDF estilizado con los resultados de la encuesta, ajustando datos largos automáticamente.
     """
     session_db = SessionLocal()
     try:
@@ -202,42 +212,69 @@ def download_survey_results_pdf(survey_id):
 
         # Crear un archivo PDF en memoria
         buffer = BytesIO()
-        c = canvas.Canvas(buffer, pagesize=letter)
-        c.setFont("Helvetica", 12)
+        doc = SimpleDocTemplate(buffer, pagesize=landscape(letter))
+
+        # Estilos
+        styles = getSampleStyleSheet()
+        title_style = styles['Title']
+        title_style.textColor = colors.HexColor('#2C3E50')
+        title_style.fontSize = 20
+
+        normal_style = styles['Normal']
+        normal_style.fontSize = 10
+
+        table_style = TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#34495E')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.HexColor('#ECF0F1'), colors.white]),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#BDC3C7')),
+        ])
+
+        # Elementos del PDF
+        elements = []
 
         # Título y encabezado del reporte
-        c.drawString(100, 750, f"Resultados de la Encuesta ID: {survey_id}")
-        c.drawString(100, 730, f"Software evaluado: {form_data['software_name']}")
-        c.drawString(100, 710, f"Empresa: {form_data['company']}")
-        c.drawString(100, 690, f"Norma de evaluación: {survey.name}")
-        c.drawString(100, 670, f"Resultado General: {overall_result}")
-        c.drawString(100, 650, f"Porcentaje Total: {round(overall_percentage, 2)}%")
-        c.drawString(100, 630, f"Puntaje Total: {total_score}/{max_score}")
+        elements.append(Paragraph("Reporte de Evaluación", title_style))
+        elements.append(Spacer(1, 20))
+        elements.append(Paragraph(f"<b>Encuesta ID:</b> {survey_id}", normal_style))
+        elements.append(Paragraph(f"<b>Software evaluado:</b> {form_data['software_name']}", normal_style))
+        elements.append(Paragraph(f"<b>Empresa:</b> {form_data['company']}", normal_style))
+        elements.append(Paragraph(f"<b>Norma de evaluación:</b> {survey.name}", normal_style))
+        elements.append(Paragraph(f"<b>Resultado General:</b> {overall_result}", normal_style))
+        elements.append(Paragraph(f"<b>Porcentaje Total:</b> {round(overall_percentage, 2)}%", normal_style))
+        elements.append(Paragraph(f"<b>Puntaje Total:</b> {round(total_score, 0)}/{max_score}", normal_style))
+        elements.append(Spacer(1, 24))
 
-        y = 610
-
-        # Detalles por pregunta
+        # Tabla de resultados
+        data = [["Sección", "Pregunta", "Descripción", "Valor", "Porcentaje"]]
         for response in responses:
             section_title = response.item.section.section_title
             item_name = response.item.item_name
-            description = response.item.description
+            description = Paragraph(response.item.description, normal_style)  # Envolver texto
             value = response.value
             max_value = 3  # Valor máximo por respuesta
             percentage = (value / max_value) * 100 if value is not None else 0.0
+            data.append([
+                section_title,
+                item_name,
+                description,
+                f"{round(value, 0)}/{max_value}",
+                f"{round(percentage, 2)}%"
+            ])
 
-            if y < 100:  # Salto de página si se alcanza el límite
-                c.showPage()
-                c.setFont("Helvetica", 12)
-                y = 750
+        table = Table(data, colWidths=[100, 100, 200, 50, 70])  # Ajustar ancho de columnas
+        table.setStyle(table_style)
+        elements.append(table)
 
-            c.drawString(100, y, f"Sección: {section_title}")
-            y -= 20
-            c.drawString(120, y, f"Pregunta: {item_name} - {value}/{max_value} ({round(percentage, 2)}%)")
-            y -= 20
-            c.drawString(140, y, f"Descripción: {description}")
-            y -= 40
+        # Dividir tabla si es necesario
+        elements.append(PageBreak())  # Dividir páginas automáticamente si los datos son extensos
 
-        c.save()
+        # Generar PDF
+        doc.build(elements)
 
         # Crear respuesta para el cliente
         buffer.seek(0)
@@ -249,4 +286,3 @@ def download_survey_results_pdf(survey_id):
         return redirect(url_for('question.surveys'))
     finally:
         session_db.close()
-
