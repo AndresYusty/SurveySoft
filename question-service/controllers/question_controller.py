@@ -20,6 +20,7 @@ from uuid import uuid4
 from sqlalchemy.sql import func
 from sqlalchemy.orm import joinedload
 from models.survey import Survey, SurveyItem, SurveySection, SurveyResults, SurveyResponse, EvaluationForm
+import time  
 
 
 
@@ -339,37 +340,51 @@ def administer_survey(survey_id):
 @question_bp.route('/surveys/<int:survey_id>/questions/new', methods=['GET', 'POST'])
 def create_question(survey_id):
     """
-    Crear una nueva pregunta para una encuesta.
+    Crear una nueva pregunta para una encuesta con un código generado automáticamente.
     """
     session_db = SessionLocal()
     try:
+        current_app.logger.info(f"Iniciando creación de una nueva pregunta para la encuesta con ID: {survey_id}")
+        
         if request.method == 'POST':
-            # Obtener datos del formulario
             item_name = request.form['item_name']
             description = request.form['description']
             section_id = request.form['section_id']
 
-            # Crear una nueva pregunta
+            current_app.logger.debug(f"Datos recibidos del formulario: item_name={item_name}, description={description}, section_id={section_id}")
+            
+            # Generar automáticamente un código único para la pregunta
+            timestamp = int(time.time())
+            code = f"Q{survey_id}_{timestamp}"  # Ejemplo: Q4_1690672953
+            current_app.logger.info(f"Código generado automáticamente para la pregunta: {code}")
+
+            # Crear y guardar la pregunta
             question = SurveyItem(
                 item_name=item_name,
                 description=description,
-                section_id=section_id
+                section_id=section_id,
+                code=code,
+                value=0  # Valor inicial por defecto
             )
             session_db.add(question)
             session_db.commit()
 
+            current_app.logger.info(f"Pregunta creada exitosamente con ID: {question.id} y código: {code}")
             flash("Pregunta creada exitosamente.", "success")
             return redirect(url_for('question.administer_survey', survey_id=survey_id))
 
-        # Obtener secciones de la encuesta para asignar la pregunta
+        # Obtener secciones de la encuesta para asignar la pregunta a una sección
         sections = session_db.query(SurveySection).filter(SurveySection.survey_id == survey_id).all()
+        current_app.logger.debug(f"Secciones obtenidas para la encuesta con ID {survey_id}: {sections}")
         return render_template('survey/new_question.html', sections=sections, survey_id=survey_id)
     except Exception as e:
         current_app.logger.error(f"Error al crear una pregunta para la encuesta con ID {survey_id}: {e}")
         flash("Hubo un error al crear la pregunta.", "error")
         return redirect(url_for('question.administer_survey', survey_id=survey_id))
     finally:
+        current_app.logger.debug("Cerrando la sesión de la base de datos.")
         session_db.close()
+
 
 
 

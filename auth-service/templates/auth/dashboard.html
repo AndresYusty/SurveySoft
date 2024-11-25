@@ -5,37 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control</title>
     <style>
+        /* Estilo general del cuerpo */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
+            background-color: #eef2f7;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            color: #333;
         }
 
+        /* Encabezado */
         header {
             background-color: #007bff;
             color: white;
-            padding: 1rem;
+            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         header h1 {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
         }
 
         .logout-button {
             background-color: #dc3545;
             color: white;
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1.2rem;
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-weight: bold;
+            font-size: 1rem;
             transition: background-color 0.3s ease;
         }
 
@@ -43,33 +48,61 @@
             background-color: #b02a37;
         }
 
+        /* Contenedor principal */
         .container {
             flex: 1;
-            max-width: 1200px;
+            max-width: 800px;
             margin: 2rem auto;
-            padding: 1rem;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
             text-align: center;
+        }
+
+        .container h2 {
+            font-size: 2rem;
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+
+        .container p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            color: #555;
+        }
+
+        /* Botones */
+        .buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .buttons a {
             text-decoration: none;
             background-color: #007bff;
             color: white;
-            padding: 10px 20px;
-            border-radius: 4px;
+            padding: 12px 24px;
+            border-radius: 8px;
             font-size: 1rem;
             font-weight: bold;
-            margin: 1rem;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .buttons a:hover {
             background-color: #0056b3;
+            transform: translateY(-3px);
         }
 
+        .buttons a:active {
+            background-color: #004494;
+            transform: translateY(0);
+        }
+
+        /* Pie de página */
         footer {
             background-color: #f8f9fa;
             padding: 1rem;
@@ -77,24 +110,44 @@
             border-top: 1px solid #e9ecef;
             color: #6c757d;
             font-size: 0.9rem;
-            margin-top: auto;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            .buttons a {
+                font-size: 0.9rem;
+                padding: 10px 20px;
+            }
+
+            .container h2 {
+                font-size: 1.8rem;
+            }
+
+            .container p {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Evaluacion de Calidad de Software</h1>
+        <h1>Evaluación de Calidad de Software</h1>
         <a href="/auth/logout" class="logout-button">Cerrar Sesión</a>
     </header>
     <div class="container">
         <h2>Bienvenido, {{ username }}</h2>
         <p>Selecciona una opción para continuar:</p>
-        <div class="container buttons">
-            <a href="http://localhost:5002/question/formulario" class="btn btn-primary">Evaluar software</a>
-            
-        </div> 
-   
-        
+        <div class="buttons">
+            <a href="http://localhost:5002/question/formulario">Evaluar software</a>
+        </div>
     </div>
     <footer>
         <p>© 2024 Calidad Software. Todos los derechos reservados.</p>
