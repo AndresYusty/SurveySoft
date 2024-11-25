@@ -4,7 +4,7 @@ from database import SessionLocal
 from sqlalchemy.orm import joinedload
 from sqlalchemy.exc import IntegrityError
 from flask import current_app
-
+from sqlalchemy.sql import func
 
 def get_all_surveys():
     session = SessionLocal()
@@ -215,6 +215,34 @@ def get_form_data(form_id):
     finally:
         session.close()
 
+
+
+def get_filtered_responses(survey_id, user_id):
+    """
+    Obtiene solo las respuestas más recientes por pregunta (item_id) para un usuario en una encuesta específica.
+    """
+    session = SessionLocal()
+    try:
+        latest_responses = session.query(
+            SurveyResponse.item_id,
+            func.max(SurveyResponse.id).label("latest_id")
+        ).filter(
+            SurveyResponse.survey_id == survey_id,
+            SurveyResponse.user_id == user_id
+        ).group_by(SurveyResponse.item_id).subquery()
+
+        responses = session.query(SurveyResponse).join(
+            latest_responses, SurveyResponse.id == latest_responses.c.latest_id
+        ).options(
+            joinedload(SurveyResponse.item).joinedload(SurveyItem.section)
+        ).all()
+
+        return responses
+    except Exception as e:
+        current_app.logger.error(f"Error al filtrar respuestas: {e}")
+        raise e
+    finally:
+        session.close()
 
 
 def get_user_survey_history(user_id):

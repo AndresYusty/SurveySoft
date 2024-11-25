@@ -14,6 +14,11 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from io import BytesIO
 from uuid import uuid4
+from sqlalchemy.sql import func
+from sqlalchemy.orm import joinedload
+from models.survey import Survey, SurveyItem, SurveySection, SurveyResults, SurveyResponse, EvaluationForm
+
+
 
 question_bp = Blueprint('question', __name__)
 
@@ -155,40 +160,81 @@ def complete_survey_view(survey_id):
 
 @question_bp.route('/surveys/<int:survey_id>/results/pdf', methods=['GET'])
 def download_survey_results_pdf(survey_id):
+    """
+    Genera un PDF con los resultados de la encuesta, incluyendo descripciones y resultados generales,
+    aplicando un filtro para evitar respuestas duplicadas.
+    """
+    session_db = SessionLocal()
     try:
-        user_id = session.get('user_id')
+        user_id = session.get('user_id')  # Obtener el usuario desde la sesión de Flask
         if not user_id:
             flash("No se pudo identificar al usuario.", "error")
             return redirect(url_for('question.surveys'))
 
-        # Obtener los resultados
-        survey_results = get_results_by_survey(survey_id, user_id)
+        # Obtener las respuestas filtradas
+        latest_responses = session_db.query(
+            SurveyResponse.item_id,
+            func.max(SurveyResponse.id).label("latest_id")
+        ).filter(
+            SurveyResponse.survey_id == survey_id,
+            SurveyResponse.user_id == user_id
+        ).group_by(SurveyResponse.item_id).subquery()
+
+        responses = session_db.query(SurveyResponse).join(
+            latest_responses, SurveyResponse.id == latest_responses.c.latest_id
+        ).options(
+            joinedload(SurveyResponse.item).joinedload(SurveyItem.section)
+        ).all()
+
+        if not responses:
+            flash("No se encontraron respuestas para esta encuesta.", "error")
+            return redirect(url_for('question.surveys'))
+
+        # Obtener datos adicionales de la encuesta y formulario
+        survey = session_db.query(Survey).filter(Survey.id == survey_id).one_or_none()
         form_data = get_form_data(session.get('form_id'))
+
+        # Calcular puntajes totales y porcentaje general
+        total_score = sum(response.value for response in responses if response.value is not None)
+        max_score = len(responses) * 3  # Suponiendo que el valor máximo por pregunta es 3
+        overall_percentage = (total_score / max_score) * 100 if max_score > 0 else 0.0
+        overall_result = calculate_overall_result(overall_percentage)
 
         # Crear un archivo PDF en memoria
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=letter)
-        c.setFont("Helvetica-Bold", 14)
+        c.setFont("Helvetica", 12)
 
-        # Título y detalles del reporte
+        # Título y encabezado del reporte
         c.drawString(100, 750, f"Resultados de la Encuesta ID: {survey_id}")
         c.drawString(100, 730, f"Software evaluado: {form_data['software_name']}")
         c.drawString(100, 710, f"Empresa: {form_data['company']}")
-        c.drawString(100, 690, f"Norma de evaluación: {survey_results['norm']}")  # Norma
+        c.drawString(100, 690, f"Norma de evaluación: {survey.name}")
+        c.drawString(100, 670, f"Resultado General: {overall_result}")
+        c.drawString(100, 650, f"Porcentaje Total: {round(overall_percentage, 2)}%")
+        c.drawString(100, 630, f"Puntaje Total: {total_score}/{max_score}")
 
-        c.setFont("Helvetica", 12)
-        c.drawString(100, 670, f"Resultado General: {survey_results['overall_result']}")
-        c.drawString(100, 650, f"Porcentaje Total: {survey_results['overall_percentage']}%")
-        c.drawString(100, 630, f"Puntaje Total: {survey_results['total_score']}/{survey_results['max_score']}")
+        y = 610
 
         # Detalles por pregunta
-        y = 610
-        for result in survey_results["results"]:
-            if y < 100:
+        for response in responses:
+            section_title = response.item.section.section_title
+            item_name = response.item.item_name
+            description = response.item.description
+            value = response.value
+            max_value = 3  # Valor máximo por respuesta
+            percentage = (value / max_value) * 100 if value is not None else 0.0
+
+            if y < 100:  # Salto de página si se alcanza el límite
                 c.showPage()
+                c.setFont("Helvetica", 12)
                 y = 750
-            c.drawString(100, y, f"Sección: {result['section_title']}")
-            c.drawString(120, y - 20, f"Pregunta: {result['item_name']} - {result['value']}/{result['max_value']} ({result['percentage']:.2f}%)")
+
+            c.drawString(100, y, f"Sección: {section_title}")
+            y -= 20
+            c.drawString(120, y, f"Pregunta: {item_name} - {value}/{max_value} ({round(percentage, 2)}%)")
+            y -= 20
+            c.drawString(140, y, f"Descripción: {description}")
             y -= 40
 
         c.save()
@@ -198,6 +244,9 @@ def download_survey_results_pdf(survey_id):
         return send_file(buffer, as_attachment=True, download_name=f"survey_{survey_id}_results.pdf", mimetype='application/pdf')
 
     except Exception as e:
-        current_app.logger.error(f"Error al descargar resultados como PDF: {e}")
-        flash("No se pudo generar el archivo PDF.", "error")
+        current_app.logger.error(f"Error al generar el PDF de resultados: {e}")
+        flash("Hubo un error al generar el archivo PDF.", "error")
         return redirect(url_for('question.surveys'))
+    finally:
+        session_db.close()
+
