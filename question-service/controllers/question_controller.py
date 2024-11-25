@@ -286,3 +286,152 @@ def download_survey_results_pdf(survey_id):
         return redirect(url_for('question.surveys'))
     finally:
         session_db.close()
+
+@question_bp.route('/surveys/<int:survey_id>/administer', methods=['GET'])
+def administer_survey(survey_id):
+    """
+    Vista para administrar una encuesta (listar preguntas, crear, actualizar, eliminar).
+    """
+    session_db = SessionLocal()
+    try:
+        current_app.logger.info(f"Iniciando administración de la encuesta con ID: {survey_id}")
+        
+        # Obtener la encuesta con sus secciones y preguntas
+        survey = session_db.query(Survey).filter(Survey.id == survey_id).one_or_none()
+        if not survey:
+            flash("Encuesta no encontrada.", "error")
+            current_app.logger.error(f"Encuesta con ID {survey_id} no encontrada.")
+            return redirect(url_for('question.surveys'))
+        
+        # Obtener preguntas asociadas a la encuesta
+        questions = (
+            session_db.query(SurveyItem, SurveySection)
+            .join(SurveySection, SurveyItem.section_id == SurveySection.id)
+            .filter(SurveySection.survey_id == survey_id)
+            .all()
+        )
+
+        current_app.logger.info(f"Encuesta encontrada: {survey.name}")
+        current_app.logger.debug(f"Preguntas encontradas: {len(questions)} preguntas para la encuesta {survey_id}")
+
+        return render_template(
+            'survey/administer_survey.html',
+            survey=survey,
+            questions=[
+                {
+                    'id': q[0].id,
+                    'item_name': q[0].item_name,
+                    'description': q[0].description,
+                    'section_title': q[1].section_title  # Cambio realizado aquí
+                }
+                for q in questions
+            ]
+        )
+    except Exception as e:
+        current_app.logger.error(f"Error al administrar la encuesta con ID {survey_id}: {e}")
+        flash("Hubo un error al cargar la encuesta.", "error")
+        return redirect(url_for('question.surveys'))
+    finally:
+        session_db.close()
+
+
+
+@question_bp.route('/surveys/<int:survey_id>/questions/create', methods=['GET', 'POST'])
+def create_question(survey_id):
+    """
+    Crear una nueva pregunta para una encuesta.
+    """
+    session_db = SessionLocal()
+    try:
+        if request.method == 'POST':
+            item_name = request.form['item_name']
+            description = request.form['description']
+            section_id = request.form['section_id']
+
+            # Validación: Verificar si la sección existe
+            section = session_db.query(SurveySection).filter(SurveySection.id == section_id, SurveySection.survey_id == survey_id).one_or_none()
+            if not section:
+                flash("Sección no válida para esta encuesta.", "error")
+                current_app.logger.warning(f"Intento de crear pregunta en una sección no válida: {section_id}")
+                return redirect(url_for('question.create_question', survey_id=survey_id))
+
+            # Crear y guardar la pregunta
+            question = SurveyItem(
+                item_name=item_name,
+                description=description,
+                section_id=section_id
+            )
+            session_db.add(question)
+            session_db.commit()
+
+            flash("Pregunta creada exitosamente.", "success")
+            current_app.logger.info(f"Pregunta creada exitosamente para la encuesta {survey_id}: {item_name}")
+            return redirect(url_for('question.administer_survey', survey_id=survey_id))
+
+        # Obtener secciones de la encuesta para asignar la pregunta a una sección
+        sections = session_db.query(SurveySection).filter(SurveySection.survey_id == survey_id).all()
+        return render_template('survey/create_question.html', sections=sections, survey_id=survey_id)
+    except Exception as e:
+        current_app.logger.error(f"Error al crear una pregunta para la encuesta con ID {survey_id}: {e}")
+        flash("Hubo un error al crear la pregunta.", "error")
+        return redirect(url_for('question.administer_survey', survey_id=survey_id))
+    finally:
+        session_db.close()
+
+
+@question_bp.route('/surveys/<int:survey_id>/questions/<int:question_id>/edit', methods=['GET', 'POST'])
+def edit_question(survey_id, question_id):
+    """
+    Editar una pregunta existente de una encuesta.
+    """
+    session_db = SessionLocal()
+    try:
+        question = session_db.query(SurveyItem).filter(SurveyItem.id == question_id).one_or_none()
+        if not question:
+            flash("Pregunta no encontrada.", "error")
+            current_app.logger.warning(f"Pregunta con ID {question_id} no encontrada en la encuesta {survey_id}")
+            return redirect(url_for('question.administer_survey', survey_id=survey_id))
+
+        if request.method == 'POST':
+            question.item_name = request.form['item_name']
+            question.description = request.form['description']
+            session_db.commit()
+
+            flash("Pregunta actualizada exitosamente.", "success")
+            current_app.logger.info(f"Pregunta actualizada exitosamente: {question.item_name}")
+            return redirect(url_for('question.administer_survey', survey_id=survey_id))
+
+        return render_template('survey/edit_question.html', question=question, survey_id=survey_id)
+    except Exception as e:
+        current_app.logger.error(f"Error al editar la pregunta con ID {question_id} en la encuesta {survey_id}: {e}")
+        flash("Hubo un error al actualizar la pregunta.", "error")
+        return redirect(url_for('question.administer_survey', survey_id=survey_id))
+    finally:
+        session_db.close()
+
+
+@question_bp.route('/surveys/<int:survey_id>/questions/<int:question_id>/delete', methods=['POST'])
+def delete_question(survey_id, question_id):
+    """
+    Eliminar una pregunta de una encuesta.
+    """
+    session_db = SessionLocal()
+    try:
+        question = session_db.query(SurveyItem).filter(SurveyItem.id == question_id).one_or_none()
+        if not question:
+            flash("Pregunta no encontrada.", "error")
+            current_app.logger.warning(f"Intento de eliminar pregunta no existente con ID {question_id} en encuesta {survey_id}")
+            return redirect(url_for('question.administer_survey', survey_id=survey_id))
+
+        session_db.delete(question)
+        session_db.commit()
+
+        flash("Pregunta eliminada exitosamente.", "success")
+        current_app.logger.info(f"Pregunta eliminada exitosamente: {question_id}")
+        return redirect(url_for('question.administer_survey', survey_id=survey_id))
+    except Exception as e:
+        current_app.logger.error(f"Error al eliminar la pregunta con ID {question_id} en la encuesta {survey_id}: {e}")
+        flash("Hubo un error al eliminar la pregunta.", "error")
+        return redirect(url_for('question.administer_survey', survey_id=survey_id))
+    finally:
+        session_db.close()

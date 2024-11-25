@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Pregunta{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Agregar Nueva Pregunta</h2>
+    <form method="POST">
+        <label for="item_name">Nombre de la Pregunta:</label>
+        <input type="text" name="item_name" id="item_name" required>
+        <label for="description">Descripción:</label>
+        <textarea name="description" id="description" rows="4" required></textarea>
+        <button type="submit" class="button">Guardar</button>
+    </form>
+</div>
+{% endblock %}
