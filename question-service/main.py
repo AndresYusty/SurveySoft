@@ -6,6 +6,8 @@ from database import init_db
 from config import SECRET_KEY
 from database import Base, engine
 from models.survey import EvaluationForm  # Importa el modelo
+from controllers.risk_controller import risk_bp
+
 import logging
 
 
@@ -18,6 +20,9 @@ app.secret_key = SECRET_KEY  # Configura la clave secreta desde config.py
 app.register_blueprint(question_bp, url_prefix='/question')
 app.register_blueprint(auth_bp, url_prefix='/auth')  # Registrar el Blueprint de autenticación
 app.register_blueprint(history_bp, url_prefix='/history')  # Registrar el Blueprint de historial
+app.register_blueprint(risk_bp, url_prefix='/risks')
+
+
 
 Base.metadata.create_all(engine)
 

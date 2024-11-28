@@ -58,6 +58,30 @@
         button:hover {
             background-color: #45a049;
         }
+        .container {
+            position: absolute;
+            bottom: 20px; /* Separación del borde inferior */
+            right: 20px; /* Separación del borde derecho */
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .btn-risk {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-risk:hover {
+            color: #f1f1f1;
+        }
     </style>
 </head>
 <body>
@@ -71,5 +95,6 @@
         {% endfor %}
         <button type="submit">Seleccionar</button>
     </form>
+
 </body>
 </html>
