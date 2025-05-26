@@ -1,50 +1,256 @@
 {% extends "base.html" %}
 
-{% block title %}Administrar Encuesta{% endblock %}
+{% block title %}Administrar Encuesta ISO 25000{% endblock %}
+
+{% block logo %}
+<svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Badge outer shape -->
+  <path d="M50 5 C60 5, 70 8, 78 15 C85 20, 90 28, 95 38 C98 45, 98 55, 95 62 C90 72, 85 80, 78 85 C70 92, 60 95, 50 95 C40 95, 30 92, 22 85 C15 80, 10 72, 5 62 C2 55, 2 45, 5 38 C10 28, 15 20, 22 15 C30 8, 40 5, 50 5 Z" 
+        fill="currentColor" opacity="0.9"/>
+  
+  <!-- Inner circle -->
+  <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="3" opacity="0.8"/>
+  
+  <!-- Checkmark -->
+  <path d="M38 50 L45 57 L62 40" fill="none" stroke="currentColor" stroke-width="4" 
+        stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  
+  <!-- Ribbon left -->
+  <path d="M25 75 L35 65 L30 85 L20 90 Z" fill="currentColor" opacity="0.7"/>
+  
+  <!-- Ribbon right -->
+  <path d="M75 75 L65 65 L70 85 L80 90 Z" fill="currentColor" opacity="0.7"/>
+</svg>
+{% endblock %}
+
+{% block header %}SurveySoft Pro{% endblock %}
+
+{% block subtitle %}Sistema de Evaluación ISO 25000{% endblock %}
+
+{% block user_info %}
+<div class="user-avatar">A</div>
+<span>Admin</span>
+{% endblock %}
 
 {% block content %}
-<div class="admin-survey-container">
     <h2 class="survey-title">Administrar Encuesta: {{ survey.name }}</h2>
     <p class="survey-info"><b>ID de la Encuesta:</b> {{ survey.id }}</p>
     <p class="survey-info"><b>Descripción:</b> {{ survey.description }}</p>
 
+    <div class="iso-info">
+        <h4>📋 Estructura Jerárquica ISO 25000</h4>
+        <p>Esta encuesta sigue la estructura oficial de ISO 25000: <strong>División → Subsección (Norma ISO) → Preguntas</strong></p>
+        <p><strong>Total de preguntas:</strong> {{ questions|length }}</p>
+    </div>
+
+    <!-- Filtros y controles -->
+    <div class="controls-section">
+        <div class="filter-controls">
+            <label for="section-filter">🔍 Filtrar por División:</label>
+            <select id="section-filter" class="filter-select">
+                <option value="all">Todas las Divisiones</option>
+            </select>
+            
+            <label for="items-per-page">📄 Preguntas por página:</label>
+            <select id="items-per-page" class="filter-select">
+                <option value="10">10</option>
+                <option value="20" selected>20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        
+        <div class="view-controls">
+            <button id="toggle-view" class="button view-button">📋 Vista por Secciones</button>
+        </div>
+    </div>
+
     <div class="question-actions">
-        <h3 class="questions-header">Preguntas</h3>
+        <h3 class="questions-header">
+            <span id="current-view-title">Todas las Preguntas por Estructura Jerárquica</span>
+            <span id="question-count" class="question-count"></span>
+        </h3>
+        
+        {% if questions %}
+            <!-- Vista por secciones (colapsable) -->
+            <div id="section-view" class="section-view" style="display: none;">
+                {% set sections = {} %}
+                {% for question in questions %}
+                    {% if question.section_title not in sections %}
+                        {% set _ = sections.update({question.section_title: []}) %}
+                    {% endif %}
+                    {% set _ = sections[question.section_title].append(question) %}
+                {% endfor %}
+                
+                {% for section_title, section_questions in sections.items() %}
+                <div class="section-group">
+                    <div class="section-header" onclick="toggleSection('{{ loop.index }}')">
+                        <h4 class="section-title">
+                            <span class="section-icon" id="icon-{{ loop.index }}">▶</span>
+                            {{ section_title }}
+                            <span class="section-count">({{ section_questions|length }} preguntas)</span>
+                        </h4>
+                    </div>
+                    <div class="section-content" id="section-{{ loop.index }}" style="display: none;">
+                        <div class="table-container">
         <table class="questions-table">
             <thead>
                 <tr>
-                    <th>Sección</th>
-                    <th>Pregunta</th>
-                    <th>Descripción</th>
-                    <th>Acciones</th>
+                                        <th class="col-subsection">Subsección (Norma ISO)</th>
+                                        <th class="col-question">Pregunta</th>
+                                        <th class="col-description">Descripción</th>
+                                        <th class="col-code">Código</th>
+                                        <th class="col-actions">Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                {% for question in questions %}
-                    <tr>
-                        <td>{{ question.section_title }}</td>
-                        <td>{{ question.item_name }}</td>
-                        <td>{{ question.description }}</td>
-                        <td>
-                            <a href="/question/surveys/{{ survey.id }}/questions/{{ question.id }}/edit" class="button edit-button">Editar</a>
-                            <form method="POST" action="/question/surveys/{{ survey.id }}/questions/{{ question.id }}/delete" style="display: inline;" onsubmit="return confirmDeletion();">
-                                <button type="submit" class="button delete-button">Eliminar</button>
+                                    {% for question in section_questions %}
+                                        <tr class="question-row">
+                                            <td class="subsection-info">
+                                                <div class="iso-code">{{ question.subsection_iso_code or 'N/A' }}</div>
+                                                <div class="subsection-name">{{ question.subsection_title }}</div>
+                                            </td>
+                                            <td class="question-name">
+                                                <div class="question-text">{{ question.item_name }}</div>
+                                            </td>
+                                            <td class="question-description">
+                                                <div class="description-text" title="{{ question.description }}">
+                                                    {{ question.description[:80] }}{% if question.description|length > 80 %}...{% endif %}
+                                                </div>
+                                            </td>
+                                            <td class="question-code">
+                                                <div class="code-text">{{ question.code or 'N/A' }}</div>
+                                            </td>
+                                            <td class="question-actions">
+                                                <div class="action-buttons">
+                                                    <a href="/question/surveys/{{ survey.id }}/questions/{{ question.id }}/edit" 
+                                                       class="button edit-button" 
+                                                       title="Editar pregunta">
+                                                        ✏️ Editar
+                                                    </a>
+                                                    <form method="POST" 
+                                                          action="/question/surveys/{{ survey.id }}/questions/{{ question.id }}/delete" 
+                                                          style="display: inline;" 
+                                                          onsubmit="return confirmDeletion('{{ question.item_name }}');">
+                                                        <button type="submit" 
+                                                                class="button delete-button" 
+                                                                title="Eliminar pregunta">
+                                                            🗑️ Eliminar
+                                                        </button>
                             </form>
+                                                </div>
                         </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <a href="/question/surveys/{{ survey.id }}/questions/new" class="button add-button">Agregar Pregunta</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Vista de tabla completa (con paginación) -->
+            <div id="table-view" class="table-view">
+                <div class="table-container">
+                    <table class="questions-table">
+                        <thead>
+                            <tr>
+                                <th class="col-division">División</th>
+                                <th class="col-subsection">Subsección (Norma ISO)</th>
+                                <th class="col-question">Pregunta</th>
+                                <th class="col-description">Descripción</th>
+                                <th class="col-code">Código</th>
+                                <th class="col-actions">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="questions-tbody">
+                            {% for question in questions %}
+                                <tr class="question-row" data-section="{{ question.section_title }}">
+                                    <td class="division-title">
+                                        <div class="division-text">{{ question.section_title }}</div>
+                                    </td>
+                                    <td class="subsection-info">
+                                        <div class="iso-code">{{ question.subsection_iso_code or 'N/A' }}</div>
+                                        <div class="subsection-name">{{ question.subsection_title }}</div>
+                                    </td>
+                                    <td class="question-name">
+                                        <div class="question-text">{{ question.item_name }}</div>
+                                    </td>
+                                    <td class="question-description">
+                                        <div class="description-text" title="{{ question.description }}">
+                                            {{ question.description[:80] }}{% if question.description|length > 80 %}...{% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="question-code">
+                                        <div class="code-text">{{ question.code or 'N/A' }}</div>
+                                    </td>
+                                    <td class="question-actions">
+                                        <div class="action-buttons">
+                                            <a href="/question/surveys/{{ survey.id }}/questions/{{ question.id }}/edit" 
+                                               class="button edit-button" 
+                                               title="Editar pregunta">
+                                                ✏️ Editar
+                                            </a>
+                                            <form method="POST" 
+                                                  action="/question/surveys/{{ survey.id }}/questions/{{ question.id }}/delete" 
+                                                  style="display: inline;" 
+                                                  onsubmit="return confirmDeletion('{{ question.item_name }}');">
+                                                <button type="submit" 
+                                                        class="button delete-button" 
+                                                        title="Eliminar pregunta">
+                                                    🗑️ Eliminar
+                                                </button>
+                                            </form>
     </div>
-    <a href="/question/surveys" class="button back-button">Volver a la lista</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
 </div>
+                
+                <!-- Paginación -->
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        <span id="pagination-info">Mostrando 1-20 de {{ questions|length }} preguntas</span>
+                    </div>
+                    <div class="pagination-controls">
+                        <button id="prev-page" class="button pagination-button" disabled>⬅️ Anterior</button>
+                        <div id="page-numbers" class="page-numbers"></div>
+                        <button id="next-page" class="button pagination-button">Siguiente ➡️</button>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="no-questions">
+                <h4>📝 Sin Preguntas</h4>
+                <p>Esta encuesta aún no tiene preguntas configuradas.</p>
+                <p>Utiliza la gestión de secciones para navegar por la estructura ISO 25000 y agregar preguntas a subsecciones específicas.</p>
+            </div>
+        {% endif %}
+
+        <div class="admin-actions">
+            <a href="/question/surveys/{{ survey.id }}/questions/new" class="button add-button">➕ Agregar Pregunta</a>
+        </div>
+    </div>
+    <a href="/question/surveys" class="button back-button">⬅️ Volver a la lista</a>
 
 <style>
+    /* Variables de color para consistencia */
+    :root {
+        --primary-blue: #2980b9;
+        --primary-blue-dark: #1f5f8b;
+        --primary-blue-light: #3498db;
+        --primary-blue-lighter: #5dade2;
+        --primary-blue-gradient: linear-gradient(135deg, #2980b9 0%, #1f5f8b 100%);
+    }
+
     /* Contenedor principal */
     .admin-survey-container {
-        max-width: 960px;
-        margin: 30px auto;
+        max-width: 95%;
+        width: 95%;
+        margin: 20px auto;
         padding: 20px;
         background-color: #ffffff;
         border: 1px solid #ddd;
@@ -60,6 +266,10 @@
         text-align: center;
         margin-bottom: 20px;
         font-family: 'Arial', sans-serif;
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     /* Información de la encuesta */
@@ -70,57 +280,333 @@
         text-align: center;
     }
 
+    /* Información ISO */
+    .iso-info {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        border-left: 4px solid var(--primary-blue-light);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .iso-info h4 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    .iso-info p {
+        color: #34495e;
+        margin: 5px 0;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    /* Controles y filtros */
+    .controls-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        flex-wrap: wrap;
+        gap: 15px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-controls {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .filter-controls label {
+        font-weight: bold;
+        color: #495057;
+        font-size: 14px;
+    }
+
+    .filter-select {
+        padding: 8px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        background-color: white;
+        font-size: 14px;
+        min-width: 150px;
+    }
+
+    .view-controls {
+        display: flex;
+        gap: 10px;
+    }
+
+    .view-button {
+        background-color: var(--primary-blue-light);
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .view-button:hover {
+        background-color: var(--primary-blue);
+    }
+
     /* Encabezado de preguntas */
     .questions-header {
         font-size: 22px;
-        color: #2980b9;
+        color: var(--primary-blue);
         margin-bottom: 15px;
         text-align: left;
         font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    /* Tabla */
+    .question-count {
+        font-size: 16px;
+        color: #6c757d;
+        font-weight: normal;
+    }
+
+    /* Vista por secciones */
+    .section-group {
+        margin-bottom: 20px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .section-header {
+        background-color: #f8f9fa;
+        padding: 15px 20px;
+        cursor: pointer;
+        border-bottom: 1px solid #dee2e6;
+        transition: background-color 0.3s ease;
+    }
+
+    .section-header:hover {
+        background-color: #e9ecef;
+    }
+
+    .section-title {
+        margin: 0;
+        color: #495057;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-icon {
+        font-size: 14px;
+        transition: transform 0.3s ease;
+        color: #6c757d;
+    }
+
+    .section-icon.expanded {
+        transform: rotate(90deg);
+    }
+
+    .section-count {
+        color: #6c757d;
+        font-weight: normal;
+        font-size: 14px;
+    }
+
+    .section-content {
+        padding: 0;
+        background-color: white;
+    }
+
+    /* Contenedor de tabla con scroll horizontal */
+    .table-container {
+        overflow-x: auto;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Tabla mejorada */
     .questions-table {
         width: 100%;
+        min-width: 1800px;
         border-collapse: collapse;
-        margin-bottom: 20px;
-    }
-
-    .questions-table th, .questions-table td {
-        border: 1px solid #ddd;
-        padding: 12px;
-        text-align: left;
-        font-size: 14px;
+        background-color: white;
+        table-layout: fixed;
     }
 
     .questions-table th {
-        background-color: #2980b9;
+        background-color: var(--primary-blue);
         color: white;
         text-align: center;
-    }
-
-    .questions-table tr:nth-child(even) {
-        background-color: #f2f2f2;
-    }
-
-    /* Botones */
-    .button {
-        padding: 8px 16px;
+        font-weight: bold;
+        padding: 14px 10px;
         font-size: 14px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        white-space: nowrap;
+    }
+
+    .questions-table td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #eee;
+        vertical-align: top;
+        font-size: 13px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Anchos específicos de columnas */
+    .col-division { 
+        width: 280px; 
+        min-width: 280px; 
+        max-width: 280px; 
+    }
+    .col-subsection { 
+        width: 320px; 
+        min-width: 320px; 
+        max-width: 320px; 
+    }
+    .col-question { 
+        width: 350px; 
+        min-width: 350px; 
+        max-width: 350px; 
+    }
+    .col-description { 
+        width: 500px; 
+        min-width: 500px; 
+        max-width: 500px; 
+    }
+    .col-code { 
+        width: 180px; 
+        min-width: 180px; 
+        max-width: 180px; 
+    }
+    .col-actions { 
+        width: 250px; 
+        min-width: 250px; 
+        max-width: 250px; 
+    }
+
+    /* Filas alternadas */
+    .question-row:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .question-row:hover {
+        background-color: #e3f2fd;
+    }
+
+    /* Contenido de celdas */
+    .division-text {
+        font-weight: bold;
+        color: #2c3e50;
+        font-size: 12px;
+        line-height: 1.3;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+    }
+
+    .subsection-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        height: 100%;
+    }
+
+    .iso-code {
+        font-family: monospace;
+        font-weight: bold;
+        color: #8e44ad;
+        font-size: 11px;
+        background-color: #f8f9fa;
+        padding: 2px 4px;
+        border-radius: 3px;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .subsection-name {
+        color: #34495e;
+        font-size: 12px;
+        line-height: 1.3;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+    }
+
+    .question-text {
+        font-weight: bold;
+        color: #27ae60;
+        font-size: 12px;
+        line-height: 1.3;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+    }
+
+    .description-text {
+        color: #7f8c8d;
+        font-size: 12px;
+        line-height: 1.4;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        cursor: help;
+        hyphens: auto;
+        max-height: 60px;
+        overflow: hidden;
+    }
+
+    .code-text {
+        font-family: monospace;
+        color: #95a5a6;
+        font-size: 11px;
+        text-align: center;
+        word-break: break-all;
+        line-height: 1.2;
+    }
+
+    /* Botones de acción */
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+    .button {
+        padding: 6px 10px;
+        font-size: 11px;
         text-decoration: none;
         border: none;
-        border-radius: 6px;
+        border-radius: 4px;
         color: white;
         cursor: pointer;
         transition: all 0.3s ease;
+        text-align: center;
+        min-width: 70px;
+        white-space: nowrap;
+        display: inline-block;
     }
 
     .edit-button {
-        background-color: #3498db;
+        background-color: var(--primary-blue-light);
     }
 
     .edit-button:hover {
-        background-color: #217dbb;
+        background-color: var(--primary-blue);
+        transform: translateY(-1px);
     }
 
     .delete-button {
@@ -129,12 +615,104 @@
 
     .delete-button:hover {
         background-color: #c0392b;
+        transform: translateY(-1px);
     }
 
+    /* Paginación */
+    .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+
+    .pagination-info {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .pagination-button {
+        background-color: #6c757d;
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .pagination-button:hover:not(:disabled) {
+        background-color: #5a6268;
+    }
+
+    .pagination-button:disabled {
+        background-color: #e9ecef;
+        color: #6c757d;
+        cursor: not-allowed;
+    }
+
+    .page-numbers {
+        display: flex;
+        gap: 5px;
+    }
+
+    .page-number {
+        padding: 8px 12px;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #495057;
+        transition: all 0.3s ease;
+    }
+
+    .page-number:hover {
+        background-color: #e9ecef;
+    }
+
+    .page-number.active {
+        background-color: var(--primary-blue);
+        color: white;
+        border-color: var(--primary-blue);
+    }
+
+    /* Sin preguntas */
+    .no-questions {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        margin-bottom: 25px;
+        border-left: 4px solid #f39c12;
+    }
+
+    .no-questions h4 {
+        color: #856404;
+        margin-bottom: 15px;
+        font-size: 20px;
+    }
+
+    .no-questions p {
+        color: #856404;
+        margin: 10px 0;
+        line-height: 1.5;
+    }
+
+    /* Botones principales */
     .add-button {
         background-color: #27ae60;
         margin-top: 15px;
         display: inline-block;
+        font-size: 16px;
+        padding: 12px 20px;
     }
 
     .add-button:hover {
@@ -145,37 +723,375 @@
         background-color: #34495e;
         margin-top: 15px;
         display: inline-block;
+        font-size: 16px;
+        padding: 12px 20px;
     }
 
     .back-button:hover {
         background-color: #2c3e50;
     }
 
+    .admin-actions {
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .admin-actions .button {
+        margin: 0 10px;
+        font-size: 16px;
+        padding: 12px 20px;
+    }
+
+    /* Scroll suave y visible */
+    .table-container {
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-blue-light) #ecf0f1;
+    }
+
+    .table-container::-webkit-scrollbar {
+        height: 12px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+        background: #ecf0f1;
+        border-radius: 6px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+        background: var(--primary-blue-light);
+        border-radius: 6px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-blue);
+    }
+
     /* Responsive */
-    @media (max-width: 768px) {
+    @media (max-width: 1800px) {
         .admin-survey-container {
             padding: 15px;
+            margin: 15px;
+            max-width: 98%;
+            width: 98%;
         }
 
-        .questions-table th, .questions-table td {
-            font-size: 12px;
-            padding: 8px;
+        .questions-table {
+            min-width: 1600px;
+        }
+    }
+
+    @media (max-width: 1400px) {
+        .admin-survey-container {
+            padding: 10px;
+            margin: 10px;
+            max-width: 100%;
+            width: 100%;
         }
 
-        .survey-title {
-            font-size: 24px;
+        .questions-table {
+            min-width: 1400px;
         }
 
-        .button {
-            font-size: 12px;
-            padding: 6px 12px;
+        .col-division { width: 250px; min-width: 250px; max-width: 250px; }
+        .col-subsection { width: 280px; min-width: 280px; max-width: 280px; }
+        .col-question { width: 300px; min-width: 300px; max-width: 300px; }
+        .col-description { width: 400px; min-width: 400px; max-width: 400px; }
+        .col-code { width: 150px; min-width: 150px; max-width: 150px; }
+        .col-actions { width: 220px; min-width: 220px; max-width: 220px; }
+    }
+
+    @media (max-width: 768px) {
+        .admin-survey-container {
+            padding: 10px;
+            margin: 5px;
         }
+
+        .questions-table {
+            min-width: 1000px;
+        }
+
+        .controls-section {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-controls {
+            justify-content: center;
+        }
+
+        .view-controls {
+            justify-content: center;
+        }
+
+        .pagination-container {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .admin-actions .button {
+            display: block;
+            margin: 5px auto;
+            width: 200px;
+        }
+
+        .col-division { width: 150px; min-width: 150px; max-width: 150px; }
+        .col-subsection { width: 180px; min-width: 180px; max-width: 180px; }
+        .col-question { width: 200px; min-width: 200px; max-width: 200px; }
+        .col-description { width: 250px; min-width: 250px; max-width: 250px; }
+        .col-code { width: 100px; min-width: 100px; max-width: 100px; }
+        .col-actions { width: 150px; min-width: 150px; max-width: 150px; }
+    }
+
+    /* Indicador de scroll */
+    .table-container::after {
+        content: "← Desliza horizontalmente para ver todas las columnas →";
+        display: block;
+        text-align: center;
+        padding: 8px;
+        background-color: #f8f9fa;
+        color: #6c757d;
+        font-size: 12px;
+        font-style: italic;
+        border-top: 1px solid #dee2e6;
+    }
+
+    /* Tooltip mejorado */
+    .description-text:hover {
+        position: relative;
+        z-index: 1000;
+        background-color: #fff3cd !important;
+        padding: 8px !important;
+        border-radius: 4px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+        max-height: none !important;
+        overflow: visible !important;
     }
 </style>
 
 <script>
-    function confirmDeletion() {
-        return confirm("¿Estás seguro de que deseas eliminar esta pregunta? Esta acción no se puede deshacer.");
+    // Variables globales
+    let currentPage = 1;
+    let itemsPerPage = 20;
+    let filteredQuestions = [];
+    let allQuestions = [];
+    let currentView = 'table'; // 'table' o 'sections'
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeData();
+        setupEventListeners();
+        setupTooltips();
+        updateDisplay();
+    });
+
+    function initializeData() {
+        // Obtener todas las preguntas de la tabla
+        const rows = document.querySelectorAll('#questions-tbody .question-row');
+        allQuestions = Array.from(rows);
+        filteredQuestions = [...allQuestions];
+        
+        // Poblar el filtro de secciones
+        const sections = [...new Set(allQuestions.map(row => row.dataset.section))];
+        const sectionFilter = document.getElementById('section-filter');
+        sections.forEach(section => {
+            const option = document.createElement('option');
+            option.value = section;
+            option.textContent = section;
+            sectionFilter.appendChild(option);
+        });
+    }
+
+    function setupEventListeners() {
+        // Filtro por sección
+        document.getElementById('section-filter').addEventListener('change', function() {
+            filterQuestions();
+        });
+
+        // Items por página
+        document.getElementById('items-per-page').addEventListener('change', function() {
+            itemsPerPage = parseInt(this.value);
+            currentPage = 1;
+            updateDisplay();
+        });
+
+        // Cambio de vista
+        document.getElementById('toggle-view').addEventListener('click', function() {
+            toggleView();
+        });
+
+        // Paginación
+        document.getElementById('prev-page').addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                updateDisplay();
+            }
+        });
+
+        document.getElementById('next-page').addEventListener('click', function() {
+            const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                updateDisplay();
+            }
+        });
+    }
+
+    function filterQuestions() {
+        const selectedSection = document.getElementById('section-filter').value;
+        
+        if (selectedSection === 'all') {
+            filteredQuestions = [...allQuestions];
+        } else {
+            filteredQuestions = allQuestions.filter(row => row.dataset.section === selectedSection);
+        }
+        
+        currentPage = 1;
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        if (currentView === 'table') {
+            updateTableView();
+        }
+        updateQuestionCount();
+    }
+
+    function updateTableView() {
+        const tbody = document.getElementById('questions-tbody');
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        
+        // Ocultar todas las filas
+        allQuestions.forEach(row => {
+            row.style.display = 'none';
+        });
+        
+        // Mostrar solo las filas de la página actual
+        const pageQuestions = filteredQuestions.slice(startIndex, endIndex);
+        pageQuestions.forEach(row => {
+            row.style.display = '';
+        });
+        
+        updatePagination();
+    }
+
+    function updatePagination() {
+        const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage);
+        const startItem = (currentPage - 1) * itemsPerPage + 1;
+        const endItem = Math.min(currentPage * itemsPerPage, filteredQuestions.length);
+        
+        // Actualizar información de paginación
+        document.getElementById('pagination-info').textContent = 
+            `Mostrando ${startItem}-${endItem} de ${filteredQuestions.length} preguntas`;
+        
+        // Actualizar botones de navegación
+        document.getElementById('prev-page').disabled = currentPage === 1;
+        document.getElementById('next-page').disabled = currentPage === totalPages;
+        
+        // Actualizar números de página
+        updatePageNumbers(totalPages);
+    }
+
+    function updatePageNumbers(totalPages) {
+        const pageNumbersContainer = document.getElementById('page-numbers');
+        pageNumbersContainer.innerHTML = '';
+        
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        
+        if (endPage - startPage < maxVisiblePages - 1) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            const pageButton = document.createElement('div');
+            pageButton.className = `page-number ${i === currentPage ? 'active' : ''}`;
+            pageButton.textContent = i;
+            pageButton.addEventListener('click', function() {
+                currentPage = i;
+                updateDisplay();
+            });
+            pageNumbersContainer.appendChild(pageButton);
+        }
+    }
+
+    function updateQuestionCount() {
+        const count = currentView === 'table' ? filteredQuestions.length : allQuestions.length;
+        document.getElementById('question-count').textContent = `(${count} preguntas)`;
+    }
+
+    function toggleView() {
+        const tableView = document.getElementById('table-view');
+        const sectionView = document.getElementById('section-view');
+        const toggleButton = document.getElementById('toggle-view');
+        const titleElement = document.getElementById('current-view-title');
+        
+        if (currentView === 'table') {
+            // Cambiar a vista por secciones
+            tableView.style.display = 'none';
+            sectionView.style.display = 'block';
+            toggleButton.textContent = '📋 Vista de Tabla';
+            titleElement.textContent = 'Preguntas Organizadas por Divisiones';
+            currentView = 'sections';
+        } else {
+            // Cambiar a vista de tabla
+            tableView.style.display = 'block';
+            sectionView.style.display = 'none';
+            toggleButton.textContent = '📋 Vista por Secciones';
+            titleElement.textContent = 'Todas las Preguntas por Estructura Jerárquica';
+            currentView = 'table';
+            updateDisplay();
+        }
+        
+        updateQuestionCount();
+    }
+
+    function toggleSection(sectionId) {
+        const content = document.getElementById(`section-${sectionId}`);
+        const icon = document.getElementById(`icon-${sectionId}`);
+        
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            icon.classList.add('expanded');
+        } else {
+            content.style.display = 'none';
+            icon.classList.remove('expanded');
+        }
+    }
+
+    function setupTooltips() {
+        const descriptionCells = document.querySelectorAll('.description-text');
+        
+        descriptionCells.forEach(cell => {
+            cell.addEventListener('mouseenter', function() {
+                if (this.scrollWidth > this.clientWidth || this.textContent.includes('...')) {
+                    this.style.backgroundColor = '#fff3cd';
+                    this.style.padding = '8px';
+                    this.style.borderRadius = '4px';
+                    this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                    this.style.maxHeight = 'none';
+                    this.style.overflow = 'visible';
+                    this.style.zIndex = '1000';
+                    this.style.position = 'relative';
+                }
+            });
+            
+            cell.addEventListener('mouseleave', function() {
+                this.style.backgroundColor = '';
+                this.style.padding = '';
+                this.style.borderRadius = '';
+                this.style.boxShadow = '';
+                this.style.maxHeight = '';
+                this.style.overflow = '';
+                this.style.zIndex = '';
+                this.style.position = '';
+            });
+        });
+    }
+
+    function confirmDeletion(questionName) {
+        return confirm(`¿Estás seguro de que deseas eliminar la pregunta "${questionName}"?\n\nEsta acción no se puede deshacer.`);
     }
 </script>
 {% endblock %}

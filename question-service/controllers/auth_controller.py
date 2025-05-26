@@ -1,4 +1,4 @@
-from flask import Blueprint, session, redirect, url_for, flash
+from flask import Blueprint, session, redirect, url_for, flash, render_template
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -14,12 +14,12 @@ def logout():
 def user_dashboard():
     if 'user_id' not in session:
         flash("Debes iniciar sesión para acceder al dashboard.")
-        return redirect(url_for('auth.login'))
+        return redirect('http://localhost:5001/auth/login')
 
     # Verifica roles, si es necesario
     if session.get('role') != 'user':  # Cambia 'user' según el rol que corresponda
         flash("No tienes permiso para acceder a esta página.")
-        return redirect(url_for('auth.login'))
+        return redirect('http://localhost:5001/auth/login')
 
     user_name = session.get('user_name', 'Usuario')
     return render_template('auth/dashboard.html', user_name=user_name)

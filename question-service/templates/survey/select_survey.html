@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seleccionar Encuesta</title>
+    <title>SurveySoft - ISO 25000</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,85 +16,85 @@
             height: 100vh;
         }
 
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        form {
+        .container {
             background: #fff;
-            padding: 20px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
             width: 100%;
+            text-align: center;
         }
 
-        div {
-            margin-bottom: 15px;
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 28px;
         }
 
-        input[type="radio"] {
+        .iso-logo {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .description {
+            color: #555;
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+
+        .loading {
+            color: #3498db;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
             margin-right: 10px;
         }
 
-        label {
-            font-size: 16px;
-            color: #555;
-        }
-
-        button {
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-        .container {
-            position: absolute;
-            bottom: 20px; /* Separación del borde inferior */
-            right: 20px; /* Separación del borde derecho */
-            background: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .btn-risk {
-            text-decoration: none;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            display: block;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-risk:hover {
-            color: #f1f1f1;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <form method="POST" action="{{ url_for('question.select_survey') }}">
-        <h1>Selecciona una Encuesta</h1>
-        {% for survey in surveys %}
-        <div>
-            <input type="radio" id="survey_{{ survey.id }}" name="survey_id" value="{{ survey.id }}" required>
-            <label for="survey_{{ survey.id }}">{{ survey.name }}</label>
-        </div>
-        {% endfor %}
-        <button type="submit">Seleccionar</button>
-    </form>
+    <div class="container">
+        <h1>SurveySoft - ISO 25000</h1>
+        
 
+        
+        <div class="description">
+            Esta aplicación está ahora especializada exclusivamente en la evaluación de calidad de software según el estándar <strong>ISO 25000</strong>.
+            <br><br>
+            La encuesta ISO 25000 se ha seleccionado automáticamente para su evaluación.
+        </div>
+        
+        <div class="loading">
+            <div class="spinner"></div>
+            Preparando la evaluación ISO 25000...
+        </div>
+    </div>
+
+    <script>
+        // Redirigir automáticamente después de mostrar el mensaje
+        setTimeout(function() {
+            window.location.href = "{{ url_for('question.select_survey') }}";
+        }, 2000);
+    </script>
 </body>
 </html>

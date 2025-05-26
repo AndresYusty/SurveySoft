@@ -3,173 +3,310 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matriz de Riesgos</title>
+    <title>Matriz de Riesgos - SurveySoft Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <style>
-        /* General Styles */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to right, #7b48b2, #e2eceb);
-            color: #212529;
+        :root {
+            --primary-blue: #3498db;
+            --primary-blue-light: #5dade2;
+            --primary-blue-dark: #2980b9;
+            --primary-blue-gradient: linear-gradient(45deg, var(--primary-blue), var(--primary-blue-light));
+        }
+
+        * {
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f5f6fa;
             min-height: 100vh;
         }
 
-        h1 {
-            color: #ffffff;
-            font-size: 3.5rem;
-            margin: 20px 0;
-            text-shadow: 2px 4px 10px rgba(0, 0, 0, 0.4);
+        /* Header */
+        .header {
+            background: var(--primary-blue-gradient);
+            padding: 20px;
+            color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        h2 {
-            color: #495057;
-            font-size: 2rem;
-            margin-bottom: 20px;
-            text-align: center;
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* Dashboard Button */
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            color: white;
+        }
+
+        .brand-text h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .brand-text .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
         .dashboard-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(to right, #343a40, #495057);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
             font-size: 1rem;
             padding: 10px 20px;
-            border-radius: 15px;
+            border-radius: 8px;
             text-decoration: none;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .dashboard-button:hover {
-            background: linear-gradient(to right, #495057, #343a40);
+            background: rgba(255, 255, 255, 0.3);
             transform: scale(1.05);
         }
 
-        /* Form Container */
-        .form-container {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            width: 90%;
-            max-width: 600px;
+        /* Main content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-title {
+            color: #2c3e50;
+            font-size: 2.5rem;
             margin-bottom: 30px;
-            animation: fadeIn 0.8s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .form-container label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #495057;
-        }
-
-        .form-container select,
-        .form-container input,
-        .form-container textarea {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-container select:focus,
-        .form-container input:focus,
-        .form-container textarea:focus {
-            border-color: #6a11cb;
-            box-shadow: 0 0 10px rgba(106, 17, 203, 0.5);
-            outline: none;
-        }
-
-        .form-container button {
-            background: linear-gradient(to right, #6a11cb, #2575fc);
-            color: white;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            padding: 12px 20px;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .form-container button:hover {
-            background: linear-gradient(to right, #2575fc, #6a11cb);
-            transform: translateY(-2px);
-        }
-
-        /* Table Styles */
-        table {
-            width: 90%;
-            max-width: 1200px;
-            border-collapse: collapse;
-            margin: 20px auto;
-            background: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        table th, table td {
-            padding: 20px;
             text-align: center;
-            font-size: 1.1rem;
-        }
-
-        table th {
-            background: linear-gradient(to right, #6a11cb, #2575fc);
-            color: white;
             font-weight: bold;
-            text-transform: uppercase;
         }
 
-        table tr:nth-child(even) {
+        /* Search and Filter Section */
+        .search-filter-section {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .search-filter-section .row {
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding-left: 40px;
+            border-radius: 20px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        /* Table Container */
+        .table-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background: var(--primary-blue);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            padding: 15px;
+            border: none;
+        }
+
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .table tbody tr:hover {
             background-color: #f8f9fa;
         }
 
-        table tr:hover {
-            background-color: #e9ecef;
-            transform: scale(1.02);
+        /* Risk Level Badges */
+        .risk-level {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-align: center;
+            display: inline-block;
         }
 
-        table td {
-            border-bottom: 1px solid #dee2e6;
+        .risk-level.bajo {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .risk-level.medio {
+            background-color: #f1c40f;
+            color: #2c3e50;
+        }
+
+        .risk-level.alto {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        /* Pagination */
+        .pagination {
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .pagination .page-item .page-link {
+            color: var(--primary-blue);
+            border: 1px solid #dee2e6;
+            padding: 8px 16px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: white;
+        }
+
+        .pagination .page-item .page-link:hover {
+            background-color: #e9ecef;
+            color: var(--primary-blue-dark);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Flash Messages */
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .flash-message.success {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .flash-message.error {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .form-container, table {
-                width: 95%;
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
             }
 
-            h1 {
-                font-size: 2.8rem;
+            .brand-text h1 {
+                font-size: 20px;
             }
 
-            h2 {
-                font-size: 1.5rem;
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .form-container {
+                padding: 20px;
             }
 
             .form-container button {
@@ -177,8 +314,8 @@
             }
 
             table th, table td {
-                padding: 12px;
-                font-size: 1rem;
+                padding: 10px;
+                font-size: 0.9rem;
             }
 
             .dashboard-button {
@@ -186,77 +323,402 @@
                 font-size: 0.9rem;
             }
         }
+
+        /* Select2 Styles Mejorados */
+        .select2-container {
+            width: 100% !important;
+            min-width: 0 !important;
+            display: block !important;
+        }
+        .select2-container--bootstrap-5 .select2-selection--single {
+            display: flex;
+            align-items: center;
+            height: 44px;
+            box-sizing: border-box;
+        }
+        .select2-container--bootstrap-5 .select2-selection__rendered {
+            display: flex !important;
+            align-items: center !important;
+            height: 100%;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
 </head>
 <body>
-    <a href="http://localhost:5001/auth/user/dashboard" class="dashboard-button">Dashboard</a>
-    <h1>Matriz de Riesgos</h1>
-    <div class="form-container">
-        <h2>Agregar Nuevo Riesgo</h2>
-        <form method="POST">
-            <label for="software_id">Software:</label>
-            <select id="software_id" name="software_id" required>
-                {% for software in software_list %}
-                <option value="{{ software.id }}">{{ software.software_name }}</option>
-                {% endfor %}
-            </select>
-
-            <label for="description">Descripción:</label>
-            <input type="text" id="description" name="description" required>
-
-            <label for="probability">Probabilidad:</label>
-            <select id="probability" name="probability" required>
-                <option value="Baja">Baja</option>
-                <option value="Media">Media</option>
-                <option value="Alta">Alta</option>
-            </select>
-
-            <label for="impact">Impacto:</label>
-            <select id="impact" name="impact" required>
-                <option value="Bajo">Bajo</option>
-                <option value="Medio">Medio</option>
-                <option value="Alto">Alto</option>
-            </select>
-
-            <label for="risk_level">Nivel de Riesgo:</label>
-            <select id="risk_level" name="risk_level" required>
-                <option value="Bajo">Bajo</option>
-                <option value="Moderado">Moderado</option>
-                <option value="Crítico">Crítico</option>
-            </select>
-
-            <label for="mitigation">Mitigación:</label>
-            <textarea id="mitigation" name="mitigation" rows="4"></textarea>
-
-            <button type="submit">Agregar Riesgo</button>
-        </form>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="brand-section">
+                <div class="logo">
+                    <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                      <!-- Badge outer shape -->
+                      <path d="M50 5 C60 5, 70 8, 78 15 C85 20, 90 28, 95 38 C98 45, 98 55, 95 62 C90 72, 85 80, 78 85 C70 92, 60 95, 50 95 C40 95, 30 92, 22 85 C15 80, 10 72, 5 62 C2 55, 2 45, 5 38 C10 28, 15 20, 22 15 C30 8, 40 5, 50 5 Z" 
+                            fill="currentColor" opacity="0.9"/>
+                      
+                      <!-- Inner circle -->
+                      <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="3" opacity="0.8"/>
+                      
+                      <!-- Checkmark -->
+                      <path d="M38 50 L45 57 L62 40" fill="none" stroke="currentColor" stroke-width="4" 
+                            stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+                      
+                      <!-- Ribbon left -->
+                      <path d="M25 75 L35 65 L30 85 L20 90 Z" fill="currentColor" opacity="0.7"/>
+                      
+                      <!-- Ribbon right -->
+                      <path d="M75 75 L65 65 L70 85 L80 90 Z" fill="currentColor" opacity="0.7"/>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>SurveySoft Pro</h1>
+                    <p class="subtitle">Sistema de Evaluación ISO 25000</p>
+                </div>
+            </div>
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="user-avatar">{{ session.username[0].upper() if session.username else 'U' }}</div>
+                    <span>{{ session.username }}</span>
+                </div>
+                <a href="http://localhost:5001/auth/user/dashboard" class="dashboard-button">Dashboard</a>
+            </div>
+        </div>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre del Software</th>
-                <th>Descripción</th>
-                <th>Probabilidad</th>
-                <th>Impacto</th>
-                <th>Nivel de Riesgo</th>
-                <th>Mitigación</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for risk, software_name in risks %}
-            <tr>
-                <td>{{ risk.risk_id }}</td>
-                <td>{{ software_name }}</td>
-                <td>{{ risk.description }}</td>
-                <td>{{ risk.probability }}</td>
-                <td>{{ risk.impact }}</td>
-                <td>{{ risk.risk_level }}</td>
-                <td>{{ risk.mitigation }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Main content -->
+    <div class="main-content">
+        <h1 class="page-title">Matriz de Riesgos</h1>
+        
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Search and Filter Section -->
+        <div class="search-filter-section">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Buscar riesgo...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="riskLevelFilter">
+                        <option value="">Todos los niveles</option>
+                        <option value="Bajo">Bajo</option>
+                        <option value="Moderado">Moderado</option>
+                        <option value="Crítico">Crítico</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="softwareFilter">
+                        <option value="">Todos los software</option>
+                        {% for software in software_list %}
+                            <option value="{{ software.software_name }}">{{ software.software_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#addRiskModal">
+                        <i class="bi bi-plus-lg"></i> Nuevo Riesgo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Software</th>
+                            <th>Descripción</th>
+                            <th>Probabilidad</th>
+                            <th>Impacto</th>
+                            <th>Nivel de Riesgo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for risk in risks %}
+                        <tr>
+                            <td>{{ risk.software.software_name }}</td>
+                            <td>{{ risk.description }}</td>
+                            <td>{{ risk.probability }}</td>
+                            <td>{{ risk.impact }}</td>
+                            <td>
+                                <span class="risk-level {{ risk.risk_level.lower() }}">
+                                    {{ risk.risk_level }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <!-- Botón Editar -->
+                                    <button type="button" class="btn btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#editRiskModal"
+                                        data-risk-id="{{ risk.risk_id }}"
+                                        data-description="{{ risk.description }}"
+                                        data-probability="{{ risk.probability }}"
+                                        data-impact="{{ risk.impact }}"
+                                        data-risk-level="{{ risk.risk_level }}"
+                                        data-mitigation="{{ risk.mitigation }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <!-- Botón Eliminar -->
+                                    <form method="POST" action="{{ url_for('risk.delete_risk', risk_id=risk.risk_id) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-action btn-delete" onclick="return confirm('¿Está seguro de eliminar este riesgo?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">No hay riesgos registrados</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {% if current_page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('manage_risk', page=current_page-1) }}">Anterior</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page in range(1, total_pages + 1) %}
+                        <li class="page-item {% if page == current_page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('manage_risk', page=page) }}">{{ page }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {% if current_page < total_pages %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('manage_risk', page=current_page+1) }}">Siguiente</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Add Risk Modal -->
+    <div class="modal fade" id="addRiskModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Agregar Nuevo Riesgo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="software_name" class="form-label">Software:</label>
+                            <select class="form-select" id="software_name" name="software_name" required>
+                                <option value="">Seleccione un software</option>
+                                {% for software in software_list %}
+                                    <option value="{{ software.software_name }}">{{ software.software_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Descripción:</label>
+                            <textarea class="form-control" id="description" name="description" required 
+                                      placeholder="Describa el riesgo identificado"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="probability" class="form-label">Probabilidad:</label>
+                            <select class="form-select" id="probability" name="probability" required>
+                                <option value="">Seleccione la probabilidad</option>
+                                <option value="Baja">Baja</option>
+                                <option value="Media">Media</option>
+                                <option value="Alta">Alta</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="impact" class="form-label">Impacto:</label>
+                            <select class="form-select" id="impact" name="impact" required>
+                                <option value="">Seleccione el impacto</option>
+                                <option value="Bajo">Bajo</option>
+                                <option value="Medio">Medio</option>
+                                <option value="Alto">Alto</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="risk_level" class="form-label">Nivel de Riesgo:</label>
+                            <select class="form-select" id="risk_level" name="risk_level" required>
+                                <option value="">Seleccione el nivel de riesgo</option>
+                                <option value="Bajo">Bajo</option>
+                                <option value="Medio">Moderado</option>
+                                <option value="Alto">Crítico</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="mitigation" class="form-label">Acciones de Mitigación:</label>
+                            <textarea class="form-control" id="mitigation" name="mitigation" rows="3" 
+                                      placeholder="Describa las acciones para mitigar el riesgo"></textarea>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Risk Modal -->
+    <div class="modal fade" id="editRiskModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" id="editRiskForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Riesgo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="risk_id" id="editRiskId">
+                        <div class="mb-3">
+                            <label for="editDescription" class="form-label">Descripción:</label>
+                            <textarea class="form-control" id="editDescription" name="description" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editProbability" class="form-label">Probabilidad:</label>
+                            <select class="form-select" id="editProbability" name="probability" required>
+                                <option value="Baja">Baja</option>
+                                <option value="Media">Media</option>
+                                <option value="Alta">Alta</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editImpact" class="form-label">Impacto:</label>
+                            <select class="form-select" id="editImpact" name="impact" required>
+                                <option value="Bajo">Bajo</option>
+                                <option value="Medio">Medio</option>
+                                <option value="Alto">Alto</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editRiskLevel" class="form-label">Nivel de Riesgo:</label>
+                            <select class="form-select" id="editRiskLevel" name="risk_level" required>
+                                <option value="Bajo">Bajo</option>
+                                <option value="Moderado">Moderado</option>
+                                <option value="Crítico">Crítico</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMitigation" class="form-label">Acciones de Mitigación:</label>
+                            <textarea class="form-control" id="editMitigation" name="mitigation" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script>
+        // Asegurarse de que jQuery esté cargado
+        if (typeof jQuery != 'undefined') {
+            // Inicializar Select2 para el campo de software
+            jQuery(document).ready(function($) {
+                $('#software_name').select2({
+                    dropdownParent: $('#addRiskModal'),
+                    theme: 'bootstrap-5',
+                    placeholder: 'Seleccione un software',
+                    allowClear: true,
+                    width: 'resolve', // Forzar a 100% del contenedor
+                    language: {
+                        noResults: function() {
+                            return "No se encontraron resultados";
+                        },
+                        searching: function() {
+                            return "Buscando...";
+                        }
+                    }
+                });
+            });
+        } else {
+            console.error('jQuery no está cargado');
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const searchText = this.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        });
+
+        // Filter functionality
+        document.getElementById('riskLevelFilter').addEventListener('change', function() {
+            const selectedLevel = this.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const riskLevel = row.querySelector('.risk-level').textContent.toLowerCase();
+                row.style.display = !selectedLevel || riskLevel === selectedLevel ? '' : 'none';
+            });
+        });
+
+        document.getElementById('softwareFilter').addEventListener('change', function() {
+            const selectedSoftware = this.value;
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const softwareName = row.querySelector('td:first-child').textContent.trim();
+                row.style.display = !selectedSoftware || softwareName === selectedSoftware ? '' : 'none';
+            });
+        });
+
+        // Modal de edición: cargar datos al abrir
+        var editRiskModal = document.getElementById('editRiskModal');
+        editRiskModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            document.getElementById('editRiskId').value = button.getAttribute('data-risk-id');
+            document.getElementById('editDescription').value = button.getAttribute('data-description');
+            document.getElementById('editProbability').value = button.getAttribute('data-probability');
+            document.getElementById('editImpact').value = button.getAttribute('data-impact');
+            document.getElementById('editRiskLevel').value = button.getAttribute('data-risk-level');
+            document.getElementById('editMitigation').value = button.getAttribute('data-mitigation');
+            // Cambia la acción del formulario
+            document.getElementById('editRiskForm').action = '/risks/edit/' + button.getAttribute('data-risk-id');
+        });
+    </script>
 </body>
 </html>

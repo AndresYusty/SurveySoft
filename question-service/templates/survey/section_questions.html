@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+
+{% block title %}Preguntas de Sección ISO 25000{% endblock %}
+{% block logo %}
+<svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Badge outer shape -->
+  <path d="M50 5 C60 5, 70 8, 78 15 C85 20, 90 28, 95 38 C98 45, 98 55, 95 62 C90 72, 85 80, 78 85 C70 92, 60 95, 50 95 C40 95, 30 92, 22 85 C15 80, 10 72, 5 62 C2 55, 2 45, 5 38 C10 28, 15 20, 22 15 C30 8, 40 5, 50 5 Z" 
+        fill="currentColor" opacity="0.9"/>
+  
+  <!-- Inner circle -->
+  <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="3" opacity="0.8"/>
+  
+  <!-- Checkmark -->
+  <path d="M38 50 L45 57 L62 40" fill="none" stroke="currentColor" stroke-width="4" 
+        stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  
+  <!-- Ribbon left -->
+  <path d="M25 75 L35 65 L30 85 L20 90 Z" fill="currentColor" opacity="0.7"/>
+  
+  <!-- Ribbon right -->
+  <path d="M75 75 L65 65 L70 85 L80 90 Z" fill="currentColor" opacity="0.7"/>
+</svg>
+{% endblock %}
+
+{% block header %}SurveySoft Pro{% endblock %}
+
+{% block subtitle %}Sistema de Evaluación ISO 25000{% endblock %}
+
+{% block user_info %}
+<div class="user-avatar">A</div>
+<span>Admin</span>
+{% endblock %}
+
+{% block content %}
+<div class="section-questions-container">
+    <h2 class="page-title">Preguntas de la Sección</h2>
+    
+    <div class="survey-context">
+        <h3>Encuesta: {{ survey.name }}</h3>
+        <p class="survey-description">{{ survey.description }}</p>
+    </div>
+
+    <div class="section-header">
+        <h3 class="section-title">{{ section.section_title }}</h3>
+        <p class="section-description">{{ section.description }}</p>
+        <div class="section-stats">
+            <span class="stat">📋 Total de Preguntas: <strong>{{ questions|length }}</strong></span>
+            <span class="stat">🆔 ID de Sección: <strong>{{ section.id }}</strong></span>
+        </div>
+    </div>
+
+    {% if questions %}
+        <div class="questions-list">
+            <h4 class="questions-header">Preguntas de esta Sección</h4>
+            <table class="questions-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Código</th>
+                        <th>Pregunta</th>
+                        <th>Descripción</th>
+                        <th>Valor</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for question in questions %}
+                        <tr>
+                            <td class="question-id">{{ question.id }}</td>
+                            <td class="question-code">{{ question.code or 'N/A' }}</td>
+                            <td class="question-name">{{ question.item_name }}</td>
+                            <td class="question-description">{{ question.description[:100] }}{% if question.description|length > 100 %}...{% endif %}</td>
+                            <td class="question-value">{{ question.value or 0 }}</td>
+                            <td class="question-actions">
+                                <a href="{{ url_for('question.edit_question', survey_id=survey.id, question_id=question.id) }}" 
+                                   class="button edit-button">✏️ Editar</a>
+                                <form method="POST" action="{{ url_for('question.delete_question', survey_id=survey.id, question_id=question.id) }}" 
+                                      style="display: inline;" onsubmit="return confirmQuestionDeletion('{{ question.item_name }}');">
+                                    <button type="submit" class="button delete-button">🗑️ Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="no-questions">
+            <h4>📝 Sin Preguntas</h4>
+            <p>Esta sección aún no tiene preguntas asignadas.</p>
+            <p>Puedes agregar preguntas específicas para esta sección usando el botón de abajo.</p>
+        </div>
+    {% endif %}
+
+    <div class="action-buttons">
+        <a href="{{ url_for('question.create_question', survey_id=survey.id) }}?section_id={{ section.id }}" 
+           class="button add-question-button">➕ Agregar Pregunta a esta Sección</a>
+        <a href="{{ url_for('question.manage_sections', survey_id=survey.id) }}" 
+           class="button back-button">⬅️ Volver a Gestión de Secciones</a>
+        <a href="{{ url_for('question.administer_survey', survey_id=survey.id) }}" 
+           class="button admin-button">🏗️ Administrar Encuesta</a>
+    </div>
+</div>
+
+<style>
+    /* Variables de color para consistencia */
+    :root {
+        --primary-blue: var(--primary-blue);
+        --primary-blue-dark: var(--primary-blue-dark);
+        --primary-blue-light: var(--primary-blue-light);
+        --primary-blue-lighter: #5dade2;
+        --primary-blue-gradient: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+    }
+
+
+    /* Contenedor principal */
+    .section-questions-container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Título de la página */
+    .page-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 3px solid #9b59b6;
+        padding-bottom: 10px;
+    }
+
+    /* Contexto de la encuesta */
+    .survey-context {
+        background: linear-gradient(135deg, var(--primary-blue-light), var(--primary-blue));
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    .survey-context h3 {
+        margin: 0 0 10px 0;
+        font-size: 20px;
+    }
+
+    .survey-description {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 16px;
+    }
+
+    /* Encabezado de la sección */
+    .section-header {
+        background-color: #f8f9fa;
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        border-left: 4px solid #9b59b6;
+    }
+
+    .section-title {
+        color: #2c3e50;
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    .section-description {
+        color: #34495e;
+        line-height: 1.6;
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
+
+    .section-stats {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .stat {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+
+    .stat strong {
+        color: #9b59b6;
+    }
+
+    /* Lista de preguntas */
+    .questions-header {
+        font-size: 20px;
+        color: #9b59b6;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+
+    .questions-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 25px;
+        background-color: white;
+    }
+
+    .questions-table th, .questions-table td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    .questions-table th {
+        background-color: #9b59b6;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .questions-table tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .question-id {
+        text-align: center;
+        font-weight: bold;
+        color: #9b59b6;
+        width: 60px;
+    }
+
+    .question-code {
+        font-family: monospace;
+        font-size: 12px;
+        color: #7f8c8d;
+        width: 120px;
+    }
+
+    .question-name {
+        font-weight: bold;
+        color: #2c3e50;
+        max-width: 200px;
+    }
+
+    .question-description {
+        color: #34495e;
+        font-size: 13px;
+        line-height: 1.4;
+        max-width: 300px;
+    }
+
+    .question-value {
+        text-align: center;
+        font-weight: bold;
+        color: #27ae60;
+        width: 80px;
+    }
+
+    .question-actions {
+        text-align: center;
+        white-space: nowrap;
+        width: 180px;
+    }
+
+    /* Sin preguntas */
+    .no-questions {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        margin-bottom: 25px;
+        border-left: 4px solid #f39c12;
+    }
+
+    .no-questions h4 {
+        color: #856404;
+        margin-bottom: 15px;
+        font-size: 20px;
+    }
+
+    .no-questions p {
+        color: #856404;
+        margin: 10px 0;
+        line-height: 1.5;
+    }
+
+    /* Botones */
+    .button {
+        padding: 10px 18px;
+        font-size: 14px;
+        text-decoration: none;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 2px;
+        display: inline-block;
+        font-weight: bold;
+    }
+
+    .edit-button {
+        background-color: var(--primary-blue-light);
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .edit-button:hover {
+        background-color: var(--primary-blue);
+    }
+
+    .delete-button {
+        background-color: #e74c3c;
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .delete-button:hover {
+        background-color: #c0392b;
+    }
+
+    .add-question-button {
+        background-color: #27ae60;
+        font-size: 16px;
+        padding: 12px 20px;
+    }
+
+    .add-question-button:hover {
+        background-color: #1e8449;
+    }
+
+    .back-button {
+        background-color: #95a5a6;
+        font-size: 16px;
+        padding: 12px 20px;
+    }
+
+    .back-button:hover {
+        background-color: #7f8c8d;
+    }
+
+    .admin-button {
+        background-color: #f39c12;
+        font-size: 16px;
+        padding: 12px 20px;
+    }
+
+    .admin-button:hover {
+        background-color: #d68910;
+    }
+
+    .action-buttons {
+        text-align: center;
+        margin-top: 25px;
+    }
+
+    .action-buttons .button {
+        margin: 0 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .section-questions-container {
+            padding: 15px;
+            margin: 15px;
+        }
+
+        .questions-table th, .questions-table td {
+            font-size: 12px;
+            padding: 8px;
+        }
+
+        .page-title {
+            font-size: 24px;
+        }
+
+        .section-stats {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-buttons .button {
+            display: block;
+            margin: 5px auto;
+            width: 90%;
+            max-width: 250px;
+        }
+
+        .question-actions .button {
+            display: block;
+            margin: 2px auto;
+            width: 80px;
+            font-size: 10px;
+            padding: 4px 8px;
+        }
+    }
+</style>
+
+<script>
+    function confirmQuestionDeletion(questionName) {
+        return confirm(`¿Estás seguro de que deseas eliminar la pregunta "${questionName}"?\n\nEsta acción no se puede deshacer.`);
+    }
+</script>
+{% endblock %} 

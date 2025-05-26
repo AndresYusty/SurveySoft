@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Sección ISO 25000{% endblock %}
+{% block logo %}
+<svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Badge outer shape -->
+  <path d="M50 5 C60 5, 70 8, 78 15 C85 20, 90 28, 95 38 C98 45, 98 55, 95 62 C90 72, 85 80, 78 85 C70 92, 60 95, 50 95 C40 95, 30 92, 22 85 C15 80, 10 72, 5 62 C2 55, 2 45, 5 38 C10 28, 15 20, 22 15 C30 8, 40 5, 50 5 Z" 
+        fill="currentColor" opacity="0.9"/>
+  
+  <!-- Inner circle -->
+  <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="3" opacity="0.8"/>
+  
+  <!-- Checkmark -->
+  <path d="M38 50 L45 57 L62 40" fill="none" stroke="currentColor" stroke-width="4" 
+        stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  
+  <!-- Ribbon left -->
+  <path d="M25 75 L35 65 L30 85 L20 90 Z" fill="currentColor" opacity="0.7"/>
+  
+  <!-- Ribbon right -->
+  <path d="M75 75 L65 65 L70 85 L80 90 Z" fill="currentColor" opacity="0.7"/>
+</svg>
+{% endblock %}
+
+{% block header %}SurveySoft Pro{% endblock %}
+
+{% block subtitle %}Sistema de Evaluación ISO 25000{% endblock %}
+
+{% block user_info %}
+<div class="user-avatar">A</div>
+<span>Admin</span>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="form-title">Agregar Nueva Sección ISO 25000</h2>
+    
+    <div class="survey-context">
+        <h3>Encuesta: {{ survey.name }}</h3>
+        <p class="survey-description">{{ survey.description }}</p>
+    </div>
+
+    <div class="iso-guidelines">
+        <h4>📋 Directrices para Secciones ISO 25000</h4>
+        <ul>
+            <li><strong>ISO/IEC 2500n:</strong> División para gestión de la calidad</li>
+            <li><strong>ISO/IEC 2501n:</strong> División para el modelo de calidad</li>
+            <li><strong>ISO/IEC 2502n:</strong> División para la medición de calidad</li>
+            <li><strong>ISO/IEC 2503n:</strong> División para los requisitos de calidad</li>
+            <li><strong>ISO/IEC 2504n:</strong> División para la evaluación de calidad</li>
+        </ul>
+    </div>
+
+    <form method="POST" class="styled-form">
+        <div class="form-group">
+            <label for="section_title">Título de la Sección:</label>
+            <input type="text" 
+                   name="section_title" 
+                   id="section_title" 
+                   placeholder="Ej: ISO/IEC 2501n: División para el modelo de calidad" 
+                   required>
+            <small class="form-hint">Utiliza el formato estándar ISO/IEC seguido de la descripción</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Descripción Detallada:</label>
+            <textarea name="description" 
+                      id="description" 
+                      rows="6" 
+                      placeholder="Describe los objetivos, alcance y componentes de esta división de la norma ISO 25000..." 
+                      required></textarea>
+            <small class="form-hint">Proporciona una descripción completa que explique el propósito y alcance de esta división</small>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="button save-button">💾 Crear Sección</button>
+            <a href="{{ url_for('question.manage_sections', survey_id=survey.id) }}" 
+               class="button cancel-button">↩️ Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Variables de color para consistencia */
+    :root {
+        --primary-blue: var(--primary-blue);
+        --primary-blue-dark: var(--primary-blue-dark);
+        --primary-blue-light: var(--primary-blue-light);
+        --primary-blue-lighter: #5dade2;
+        --primary-blue-gradient: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+    }
+
+
+    /* Contenedor principal del formulario */
+    .form-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 3px solid var(--primary-blue-light);
+        padding-bottom: 10px;
+    }
+
+    /* Contexto de la encuesta */
+    .survey-context {
+        background: linear-gradient(135deg, var(--primary-blue-light), var(--primary-blue));
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    .survey-context h3 {
+        margin: 0 0 10px 0;
+        font-size: 20px;
+    }
+
+    .survey-description {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 16px;
+    }
+
+    /* Directrices ISO */
+    .iso-guidelines {
+        background-color: #ecf0f1;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        border-left: 4px solid var(--primary-blue-light);
+    }
+
+    .iso-guidelines h4 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+
+    .iso-guidelines ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    .iso-guidelines li {
+        color: #34495e;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+
+    .iso-guidelines strong {
+        color: var(--primary-blue);
+    }
+
+    /* Formulario */
+    .styled-form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        font-size: 16px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-group input, .form-group textarea {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 14px;
+        border: 2px solid #bdc3c7;
+        border-radius: 8px;
+        background-color: #ffffff;
+        transition: all 0.3s ease;
+        font-family: Arial, sans-serif;
+    }
+
+    .form-group input:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-blue-light);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .form-hint {
+        display: block;
+        color: #7f8c8d;
+        font-size: 12px;
+        margin-top: 5px;
+        font-style: italic;
+    }
+
+    /* Botones de acción */
+    .form-actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .button {
+        padding: 12px 25px;
+        font-size: 16px;
+        text-decoration: none;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        text-align: center;
+        min-width: 150px;
+    }
+
+    .save-button {
+        background: linear-gradient(135deg, #27ae60, #229954);
+    }
+
+    .save-button:hover {
+        background: linear-gradient(135deg, #229954, #1e8449);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+    }
+
+    .cancel-button {
+        background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    }
+
+    .cancel-button:hover {
+        background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(149, 165, 166, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-container {
+            margin: 20px;
+            padding: 20px;
+        }
+
+        .form-title {
+            font-size: 24px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .button {
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .iso-guidelines ul {
+            padding-left: 15px;
+        }
+
+        .iso-guidelines li {
+            font-size: 14px;
+        }
+    }
+</style>
+
+<script>
+    // Validación del formulario
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.styled-form');
+        const titleInput = document.getElementById('section_title');
+        const descriptionInput = document.getElementById('description');
+
+        form.addEventListener('submit', function(e) {
+            if (titleInput.value.trim().length < 10) {
+                e.preventDefault();
+                alert('El título de la sección debe tener al menos 10 caracteres.');
+                titleInput.focus();
+                return false;
+            }
+
+            if (descriptionInput.value.trim().length < 50) {
+                e.preventDefault();
+                alert('La descripción debe tener al menos 50 caracteres para proporcionar información adecuada.');
+                descriptionInput.focus();
+                return false;
+            }
+
+            return true;
+        });
+    });
+</script>
+{% endblock %} 

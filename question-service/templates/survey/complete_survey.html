@@ -154,18 +154,27 @@
             <div class="section">
                 <h3>{{ section.section_title }}</h3>
                 <p>{{ section.description }}</p>
-                {% for item in section.items %}
-                <div class="question">
-                    <label for="item_{{ item.id }}">
-                        {{ item.item_name }}
-                    </label>
-                    <p>{{ item.description }}</p>
-                    <select name="item_{{ item.id }}" id="item_{{ item.id }}" required>
-                        <option value="" disabled selected>Seleccione una opción</option>
-                        <option value="1">1 - Poco Satisfecho</option>
-                        <option value="2">2 - Satisfecho</option>
-                        <option value="3">3 - Muy Satisfecho</option>
-                    </select>
+                
+                {% for subsection in section.subsections %}
+                <div style="margin-left: 20px; margin-bottom: 2rem; padding: 1rem; border-left: 3px solid #007bff; background-color: #f8f9fa;">
+                    <h4 style="color: #007bff; margin-bottom: 0.5rem;">{{ subsection.subsection_title }}</h4>
+                    <p style="font-size: 0.85rem; color: #6c757d; margin-bottom: 1rem;"><strong>Código ISO:</strong> {{ subsection.iso_code }}</p>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem;">{{ subsection.description }}</p>
+                    
+                    {% for item in subsection.items %}
+                    <div class="question">
+                        <label for="item_{{ item.id }}">
+                            {{ item.item_name }}
+                        </label>
+                        <p>{{ item.description }}</p>
+                        <select name="item_{{ item.id }}" id="item_{{ item.id }}" required>
+                            <option value="" disabled selected>Seleccione una opción</option>
+                            <option value="1">1 - Poco Satisfecho</option>
+                            <option value="2">2 - Satisfecho</option>
+                            <option value="3">3 - Muy Satisfecho</option>
+                        </select>
+                    </div>
+                    {% endfor %}
                 </div>
                 {% endfor %}
             </div>

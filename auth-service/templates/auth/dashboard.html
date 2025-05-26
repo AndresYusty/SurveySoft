@@ -3,73 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control</title>
+    <title>Panel de Control - SurveySoft Pro</title>
     <style>
+        /* Variables de color para consistencia */
+        :root {
+            --primary-blue: #2980b9;
+            --primary-blue-dark: #1f5f8b;
+            --primary-blue-light: #3498db;
+            --primary-blue-lighter: #5dade2;
+            --primary-blue-gradient: linear-gradient(135deg, #2980b9 0%, #1f5f8b 100%);
+        }
+
         /* Estilo general del cuerpo */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #eef2f7;
+            background-color: #f0f2f5;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             color: #333;
         }
 
-        /* Encabezado */
-        header {
-            background-color: #007bff;
+        /* Header */
+        .header {
+            background: var(--primary-blue-gradient);
             color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        header h1 {
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            color: white;
+            margin-right: 15px;
+        }
+
+        .brand-text h1 {
             margin: 0;
-            font-size: 1.8rem;
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffffff, #e8f4f8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-text .subtitle {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
         }
 
         .logout-button {
-            background-color: #dc3545;
+            background: rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 0.6rem 1.2rem;
+            padding: 8px 16px;
             text-decoration: none;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .logout-button:hover {
-            background-color: #b02a37;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
         }
 
         /* Contenedor principal */
         .container {
             flex: 1;
-            max-width: 800px;
+            max-width: 900px;
             margin: 2rem auto;
             padding: 2rem;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
 
-        .container h2 {
-            font-size: 2rem;
-            color: #007bff;
-            margin-bottom: 1rem;
+        .welcome-section {
+            margin-bottom: 2rem;
         }
 
-        .container p {
+        .container h2 {
+            font-size: 2.2rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .container .welcome-subtitle {
             font-size: 1.1rem;
+            color: #6c757d;
             margin-bottom: 2rem;
-            color: #555;
+        }
+
+        .iso-badge {
+            background: var(--primary-blue-gradient);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .iso-badge h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.3rem;
+        }
+
+        .iso-badge p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
         }
 
         /* Botones */
@@ -77,35 +165,45 @@
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
 
         .buttons a {
             text-decoration: none;
-            background-color: #007bff;
+            background: var(--primary-blue-gradient);
             color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 1rem;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
             font-weight: bold;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            transition: all 0.3s ease;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .buttons a:hover {
-            background-color: #0056b3;
+            background: linear-gradient(45deg, var(--primary-blue), var(--primary-blue-dark));
             transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
         .buttons a:active {
-            background-color: #004494;
             transform: translateY(0);
+        }
+
+        .button-icon {
+            font-size: 1.2rem;
         }
 
         /* Pie de página */
         footer {
             background-color: #f8f9fa;
-            padding: 1rem;
+            padding: 1.5rem;
             text-align: center;
             border-top: 1px solid #e9ecef;
             color: #6c757d;
@@ -118,40 +216,113 @@
 
         /* Responsivo */
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.5rem;
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .brand-text h1 {
+                font-size: 20px;
+            }
+
+            .user-section {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .buttons {
+                flex-direction: column;
+                align-items: center;
             }
 
             .buttons a {
-                font-size: 0.9rem;
-                padding: 10px 20px;
+                width: 100%;
+                max-width: 300px;
+                font-size: 1rem;
+                padding: 12px 24px;
             }
 
             .container h2 {
                 font-size: 1.8rem;
             }
 
-            .container p {
+            .container .welcome-subtitle {
                 font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Evaluación de Calidad de Software</h1>
-        <a href="/auth/logout" class="logout-button">Cerrar Sesión</a>
-    </header>
-    <div class="container">
-        <h2>Bienvenide, {{ username }}</h2>
-        <p>Selecciona una opción para continuar:</p>
-        <div class="buttons">
-            <a href="http://localhost:5002/question/formulario">Evaluar software</a>
-            <a href="http://localhost:5002/risks/" class="button">Evaluar Matriz de Riesgos</a>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="brand-section">
+                <div class="logo">
+                    <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                      <!-- Badge outer shape -->
+                      <path d="M50 5 C60 5, 70 8, 78 15 C85 20, 90 28, 95 38 C98 45, 98 55, 95 62 C90 72, 85 80, 78 85 C70 92, 60 95, 50 95 C40 95, 30 92, 22 85 C15 80, 10 72, 5 62 C2 55, 2 45, 5 38 C10 28, 15 20, 22 15 C30 8, 40 5, 50 5 Z" 
+                            fill="currentColor" opacity="0.9"/>
+                      
+                      <!-- Inner circle -->
+                      <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="3" opacity="0.8"/>
+                      
+                      <!-- Checkmark -->
+                      <path d="M38 50 L45 57 L62 40" fill="none" stroke="currentColor" stroke-width="4" 
+                            stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+                      
+                      <!-- Ribbon left -->
+                      <path d="M25 75 L35 65 L30 85 L20 90 Z" fill="currentColor" opacity="0.7"/>
+                      
+                      <!-- Ribbon right -->
+                      <path d="M75 75 L65 65 L70 85 L80 90 Z" fill="currentColor" opacity="0.7"/>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>SurveySoft Pro</h1>
+                    <p class="subtitle">Sistema de Evaluación ISO 25000</p>
+                </div>
+            </div>
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="user-avatar">{{ username[0].upper() if username else 'U' }}</div>
+                    <span>{{ username }}</span>
+                </div>
+                <a href="/auth/logout" class="logout-button">Cerrar Sesión</a>
+            </div>
         </div>
     </div>
+
+    <!-- Main content -->
+    <div class="container">
+        <div class="welcome-section">
+            <h2>¡Bienvenido, {{ username }}!</h2>
+            <p class="welcome-subtitle">Herramienta profesional para evaluación de calidad de software</p>
+        </div>
+
+        <div class="iso-badge">
+            <h3>ISO 25000</h3>
+            <p>Estándar Internacional para Evaluación de Calidad de Software</p>
+        </div>
+
+        <div class="buttons">
+            <a href="http://localhost:5002/question/formulario">
+                <span class="button-icon">📋</span>
+                Evaluar Software
+            </a>
+            <a href="http://localhost:5002/risks/">
+                <span class="button-icon">⚠️</span>
+                Matriz de Riesgos
+            </a>
+            <a href="http://localhost:5002/history/my-history">
+                <span class="button-icon">📊</span>
+                Ver Mi Historial
+            </a>
+            
+        </div>
+    </div>
+
     <footer>
-        <p>© 2024 Calidad Software. Todos los derechos reservados.</p>
+        <p>© 2024 SurveySoft Pro - Sistema de Evaluación ISO 25000. Todos los derechos reservados.</p>
     </footer>
 </body>
 </html>

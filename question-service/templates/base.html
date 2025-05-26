@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Evaluación de Calidad de Software{% endblock %}</title>
     <style>
+        /* Variables de color para consistencia */
+        :root {
+            --primary-blue: #2980b9;
+            --primary-blue-dark: #1f5f8b;
+            --primary-blue-light: #3498db;
+            --primary-blue-lighter: #5dade2;
+            --primary-blue-gradient: linear-gradient(135deg, #2980b9 0%, #1f5f8b 100%);
+        }
+
         /* Reset básico */
         * {
             margin: 0;
@@ -24,59 +33,180 @@
 
         /* Header */
         header {
-            background-color: #0066cc;
+            background: var(--primary-blue-gradient);
             color: white;
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(41, 128, 185, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 2;
+            position: relative;
+        }
+
+        .logo {
+            width: 55px;
+            height: 55px;
+            background: var(--primary-blue-gradient);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 20px rgba(41, 128, 185, 0.4);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo svg {
+            width: 35px;
+            height: 35px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover svg {
+            transform: scale(1.1);
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
         }
 
         header h1 {
-            font-size: 2rem;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(45deg, #ffffff, #e8f4fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: -0.5px;
+            font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+            margin: -5px 0 0 0;
+            letter-spacing: 0.5px;
+            font-style: italic;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            z-index: 2;
+            position: relative;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #ffeaa7, #fab1a0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: bold;
+            color: #2d3436;
+            font-size: 16px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
         }
 
         .logout-button {
-            background-color: #e63946;
+            background: linear-gradient(45deg, #e17055, #d63031);
             color: white;
-            padding: 0.6rem 1.2rem;
+            padding: 0.7rem 1.5rem;
             border: none;
-            border-radius: 6px;
+            border-radius: 25px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
             text-decoration: none;
             transition: all 0.3s ease;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(214, 48, 49, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logout-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .logout-button:hover::before {
+            left: 100%;
         }
 
         .logout-button:hover {
-            background-color: #d62839;
+            background: linear-gradient(45deg, #d63031, #b71c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(214, 48, 49, 0.4);
         }
 
         /* Main */
         main {
             flex: 1;
-            padding: 2rem;
-            max-width: 1200px;
-            margin: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            padding: 0;
+            width: 100%;
+            display: block;
         }
 
         .container {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
             width: 100%;
-            max-width: 900px;
+            max-width: 1600px;
+            margin: 0 auto;
         }
 
         h2 {
             margin-bottom: 1.5rem;
-            color: #0066cc;
+            color: var(--primary-blue);
             font-size: 1.8rem;
             text-align: center;
         }
@@ -91,7 +221,7 @@
         /* Botones */
         .button {
             display: inline-block;
-            background-color: #0066cc;
+            background-color: var(--primary-blue);
             color: white;
             padding: 0.75rem 1.5rem;
             text-decoration: none;
@@ -103,7 +233,7 @@
         }
 
         .button:hover {
-            background-color: #004d99;
+            background-color: var(--primary-blue-dark);
             transform: translateY(-2px);
         }
 
@@ -124,8 +254,54 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            header {
+                padding: 0.8rem 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header-content {
+                flex-direction: row;
+                justify-content: center;
+                gap: 0.8rem;
+            }
+
+            .logo {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .logo svg {
+                width: 25px;
+                height: 25px;
+            }
+
             header h1 {
-                font-size: 1.5rem;
+                font-size: 1.6rem;
+            }
+
+            .subtitle {
+                font-size: 0.8rem;
+            }
+
+            .nav-actions {
+                gap: 1rem;
+            }
+
+            .user-info {
+                font-size: 0.85rem;
+            }
+
+            .user-avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+
+            .logout-button {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.85rem;
             }
 
             .container {
@@ -141,12 +317,50 @@
                 padding: 0.6rem 1.2rem;
             }
         }
+
+        @media (max-width: 480px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+
+            .brand-text {
+                align-items: center;
+            }
+
+            header h1 {
+                font-size: 1.4rem;
+            }
+
+            .nav-actions {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>{% block header %}Evaluación de Calidad de Software{% endblock %}</h1>
-        <a href="http://localhost:5001/auth/logout" class="logout-button">Cerrar Sesión</a>
+        <div class="header-content">
+            <div class="logo">
+                {% block logo %}
+                <!-- Logo content -->
+                {% endblock %}
+            </div>
+            <div class="brand-text">
+                <h1>{% block header %}Evaluación de Calidad de Software{% endblock %}</h1>
+                <p class="subtitle">{% block subtitle %}Subtítulo de la aplicación{% endblock %}</p>
+            </div>
+        </div>
+        <div class="nav-actions">
+            <div class="user-info">
+                {% block user_info %}
+                <!-- User info content -->
+                {% endblock %}
+            </div>
+            <a href="http://localhost:5001/auth/logout" class="logout-button">Cerrar Sesión</a>
+        </div>
     </header>
     <main>
         <div class="container">
@@ -156,7 +370,7 @@
         </div>
     </main>
     <footer>
-        <p>© 2024 Mi Aplicación. Todos los derechos reservados.</p>
+        <p>© 2024 SurveySoft. Todos los derechos reservados.</p>
     </footer>
 </body>
 </html>

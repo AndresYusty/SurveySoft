@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completar Encuesta - {{ current_section.section_title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+            margin: 0;
+            padding: 0;
+            color: #212529;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 2rem;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-weight: 500;
+            color: #495057;
+            margin-top: 0.5rem;
+        }
+
+        /* Header */
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #343a40;
+            margin-bottom: 0.5rem;
+        }
+
+        .survey-title {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+
+        /* Section Header */
+        .section-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-description {
+            font-size: 1rem;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        /* Subsections */
+        .subsection {
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            border-left: 4px solid #007bff;
+            background-color: #f8f9fa;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .subsection-title {
+            color: #007bff;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .subsection-code {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .subsection-description {
+            font-size: 0.95rem;
+            color: #495057;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        /* Questions */
+        .question {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .question:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .question-description {
+            font-size: 0.95rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            color: #495057;
+            background-color: #fff;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        select:valid {
+            border-color: #28a745;
+        }
+
+        /* Navigation Buttons */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #dee2e6;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #545b62);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #545b62, #3d4449);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #1e7e34, #155724);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Flash Messages */
+        .flash-messages {
+            margin-bottom: 1rem;
+        }
+
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .navigation {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Icons */
+        .icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'error' if category == 'error' else 'success' }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ ((section_index + 1) / total_sections * 100) | round(1) }}%"></div>
+            </div>
+            <div class="progress-text">
+                Sección {{ section_index + 1 }} de {{ total_sections }} 
+                ({{ ((section_index + 1) / total_sections * 100) | round(1) }}% completado)
+            </div>
+        </div>
+
+        <!-- Header -->
+        <h1>Evaluación ISO 25000</h1>
+
+        <!-- Section Header -->
+        <div class="section-header">
+            <div class="section-title">{{ current_section.section_title }}</div>
+            <div class="section-description">{{ current_section.description }}</div>
+        </div>
+
+        <!-- Form -->
+        <form method="POST" id="surveyForm">
+            {% for subsection in current_section.subsections %}
+            <div class="subsection">
+                <div class="subsection-title">{{ subsection.subsection_title }}</div>
+                <div class="subsection-code"><strong>Código ISO:</strong> {{ subsection.iso_code }}</div>
+                <div class="subsection-description">{{ subsection.description }}</div>
+                
+                {% for item in subsection.items %}
+                <div class="question">
+                    <label for="item_{{ item.id }}" class="question-label">
+                        {{ item.item_name }}
+                    </label>
+                    <div class="question-description">{{ item.description }}</div>
+                    <select name="item_{{ item.id }}" id="item_{{ item.id }}" required>
+                        <option value="" disabled {% if item.id not in existing_responses %}selected{% endif %}>
+                            Seleccione una opción
+                        </option>
+                        <option value="1" {% if existing_responses.get(item.id) == 1 %}selected{% endif %}>
+                            1 - Poco Satisfecho
+                        </option>
+                        <option value="2" {% if existing_responses.get(item.id) == 2 %}selected{% endif %}>
+                            2 - Satisfecho
+                        </option>
+                        <option value="3" {% if existing_responses.get(item.id) == 3 %}selected{% endif %}>
+                            3 - Muy Satisfecho
+                        </option>
+                    </select>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+            <!-- Navigation -->
+            <div class="navigation">
+                <div>
+                    {% if section_index > 0 %}
+                        <button type="submit" name="action" value="previous" class="btn btn-secondary">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                            </svg>
+                            Anterior
+                        </button>
+                    {% endif %}
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    {% if section_index < total_sections - 1 %}
+                        <button type="submit" name="action" value="next" class="btn btn-primary">
+                            Siguiente
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
+                            </svg>
+                        </button>
+                    {% else %}
+                        <button type="submit" name="action" value="finish" class="btn btn-success">
+                            Finalizar Encuesta
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </button>
+                    {% endif %}
+                    
+                    <!-- Botón para finalizar en cualquier momento -->
+                    {% if section_index < total_sections - 1 %}
+                        <button type="submit" name="action" value="finish" class="btn btn-success" 
+                                onclick="return confirm('¿Está seguro de que desea finalizar la encuesta? Las secciones no completadas quedarán en blanco.')">
+                            Finalizar Ahora
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+
+        <!-- Back to Dashboard -->
+        <div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #dee2e6;">
+            <a href="http://localhost:5001/auth/user/dashboard" style="color: #6c757d; text-decoration: none;">
+                ← Volver al Panel Principal
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Auto-save functionality (optional)
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('surveyForm');
+            const selects = form.querySelectorAll('select');
+            
+            // Add visual feedback when questions are answered
+            selects.forEach(select => {
+                select.addEventListener('change', function() {
+                    if (this.value) {
+                        this.style.borderColor = '#28a745';
+                        this.parentElement.style.backgroundColor = '#f8fff9';
+                    }
+                });
+            });
+
+            // Form validation before submission
+            form.addEventListener('submit', function(e) {
+                const action = e.submitter.value;
+                
+                if (action === 'next' || action === 'finish') {
+                    const unanswered = Array.from(selects).filter(select => !select.value);
+                    
+                    if (unanswered.length > 0 && action === 'next') {
+                        if (!confirm(`Hay ${unanswered.length} pregunta(s) sin responder. ¿Desea continuar de todos modos?`)) {
+                            e.preventDefault();
+                            // Scroll to first unanswered question
+                            unanswered[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            unanswered[0].focus();
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

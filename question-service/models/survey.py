@@ -27,14 +27,28 @@ class SurveySection(Base):
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
     survey = relationship('Survey', back_populates='sections')
-    items = relationship('SurveyItem', back_populates='section', lazy="select")
+    subsections = relationship('SurveySubSection', back_populates='section', lazy="select")
+
+
+class SurveySubSection(Base):
+    __tablename__ = "survey_subsection"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    section_id = Column(Integer, ForeignKey("survey_section.id", ondelete="CASCADE"))
+    subsection_title = Column(String(255))
+    description = Column(Text)
+    iso_code = Column(String(50))  # Para almacenar códigos como "ISO/IEC 25010"
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+    section = relationship('SurveySection', back_populates='subsections')
+    items = relationship('SurveyItem', back_populates='subsection', lazy="select")
 
 
 class SurveyItem(Base):
     __tablename__ = 'survey_item'
 
     id = Column(Integer, primary_key=True)
-    section_id = Column(Integer, ForeignKey('survey_section.id', ondelete="CASCADE"))
+    subsection_id = Column(Integer, ForeignKey('survey_subsection.id', ondelete="CASCADE"))
     code = Column(String(50), nullable=True)  # Código único para cada pregunta
     item_name = Column(String(255))
     description = Column(Text)
@@ -43,7 +57,7 @@ class SurveyItem(Base):
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
     # Relaciones
-    section = relationship('SurveySection', back_populates='items')
+    subsection = relationship('SurveySubSection', back_populates='items')
     results = relationship('SurveyResults', back_populates='item')
 
 
@@ -93,5 +107,6 @@ class EvaluationForm(Base):
     specific_objectives = Column(String(500), nullable=False)
     created_at = Column(DateTime, default=func.now())
 
-    # Relación con SurveyResults
+    # Relaciones
     results = relationship("SurveyResults", back_populates="form")
+    risks = relationship("RiskMatrix", back_populates="software")

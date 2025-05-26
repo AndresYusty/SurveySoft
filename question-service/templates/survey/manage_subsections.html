@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block title %}Administrar Subsecciones ISO 25000{% endblock %}
+
+{% block logo %}
+<svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Badge outer shape -->
+  <path d="M50 5 C60 5, 70 8, 78 15 C85 20, 90 28, 95 38 C98 45, 98 55, 95 62 C90 72, 85 80, 78 85 C70 92, 60 95, 50 95 C40 95, 30 92, 22 85 C15 80, 10 72, 5 62 C2 55, 2 45, 5 38 C10 28, 15 20, 22 15 C30 8, 40 5, 50 5 Z" 
+        fill="currentColor" opacity="0.9"/>
+  
+  <!-- Inner circle -->
+  <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="3" opacity="0.8"/>
+  
+  <!-- Checkmark -->
+  <path d="M38 50 L45 57 L62 40" fill="none" stroke="currentColor" stroke-width="4" 
+        stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  
+  <!-- Ribbon left -->
+  <path d="M25 75 L35 65 L30 85 L20 90 Z" fill="currentColor" opacity="0.7"/>
+  
+  <!-- Ribbon right -->
+  <path d="M75 75 L65 65 L70 85 L80 90 Z" fill="currentColor" opacity="0.7"/>
+</svg>
+{% endblock %}
+
+{% block header %}SurveySoft Pro{% endblock %}
+
+{% block subtitle %}Sistema de Evaluación ISO 25000{% endblock %}
+
+{% block user_info %}
+<div class="user-avatar">A</div>
+<span>Admin</span>
+{% endblock %}
+
+{% block content %}
+<div class="admin-subsections-container">
+    <h2 class="page-title">Administrar Subsecciones ISO 25000</h2>
+    
+    <div class="survey-info">
+        <h3 class="survey-name">{{ survey.name }}</h3>
+        <p class="survey-description">{{ survey.description }}</p>
+    </div>
+
+    <div class="section-context">
+        <h3 class="section-title">{{ section.section_title }}</h3>
+        <p class="section-description">{{ section.description }}</p>
+        <div class="section-stats">
+            <span class="stat">📋 Total Subsecciones: <strong>{{ subsections|length }}</strong></span>
+            <span class="stat">📝 Total Preguntas: <strong>
+                {% set total_questions = 0 %}
+                {% for subsection in subsections %}
+                    {% set total_questions = total_questions + (subsection.items|length if subsection.items else 0) %}
+                {% endfor %}
+                {{ total_questions }}
+            </strong></span>
+        </div>
+    </div>
+
+    <div class="subsections-actions">
+        <h3 class="subsections-header">Subsecciones (Normas ISO específicas)</h3>
+        
+        {% if subsections %}
+            <table class="subsections-table">
+                <thead>
+                    <tr>
+                        <th>Código ISO</th>
+                        <th>Norma</th>
+                        <th>Descripción</th>
+                        <th>Preguntas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subsection in subsections %}
+                        <tr>
+                            <td class="subsection-code">{{ subsection.iso_code or 'N/A' }}</td>
+                            <td class="subsection-title">{{ subsection.subsection_title }}</td>
+                            <td class="subsection-description">{{ subsection.description[:100] }}{% if subsection.description|length > 100 %}...{% endif %}</td>
+                            <td class="subsection-questions">{{ subsection.items|length if subsection.items else 0 }}</td>
+                            <td class="subsection-actions">
+                                <a href="{{ url_for('question.view_subsection_questions', survey_id=survey.id, section_id=section.id, subsection_id=subsection.id) }}" 
+                                   class="button view-questions-button">Ver Preguntas</a>
+                                <a href="{{ url_for('question.edit_subsection', survey_id=survey.id, section_id=section.id, subsection_id=subsection.id) }}" 
+                                   class="button edit-button">Editar</a>
+                                <form method="POST" action="{{ url_for('question.delete_subsection_view', survey_id=survey.id, section_id=section.id, subsection_id=subsection.id) }}" 
+                                      style="display: inline;" onsubmit="return confirmSubsectionDeletion('{{ subsection.subsection_title }}');">
+                                    <button type="submit" class="button delete-button">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="no-subsections">
+                <h4>📑 Sin Subsecciones</h4>
+                <p>Esta división aún no tiene subsecciones (normas ISO específicas) configuradas.</p>
+                <p>Las subsecciones representan las normas específicas dentro de cada división de ISO 25000.</p>
+            </div>
+        {% endif %}
+        
+        <div class="action-buttons">
+            <a href="{{ url_for('question.create_subsection_view', survey_id=survey.id, section_id=section.id) }}" 
+               class="button add-subsection-button">Agregar Nueva Subsección</a>
+            <a href="{{ url_for('question.manage_sections', survey_id=survey.id) }}" 
+               class="button back-button">Volver a Divisiones</a>
+            <a href="{{ url_for('question.administer_survey', survey_id=survey.id) }}" 
+               class="button admin-button">Administrar Encuesta</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Variables de color para consistencia */
+    :root {
+        --primary-blue: #2980b9;
+        --primary-blue-dark: #1f5f8b;
+        --primary-blue-light: #3498db;
+        --primary-blue-lighter: #5dade2;
+        --primary-blue-gradient: linear-gradient(135deg, #2980b9 0%, #1f5f8b 100%);
+    }
+
+    /* Contenedor principal */
+    .admin-subsections-container {
+        max-width: 1400px;
+        margin: 30px auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Título de la página */
+    .page-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 3px solid var(--primary-blue-light);
+        padding-bottom: 10px;
+    }
+
+    /* Información de la encuesta */
+    .survey-info {
+        background: var(--primary-blue-gradient);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .survey-name {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .survey-description {
+        font-size: 16px;
+        opacity: 0.9;
+    }
+
+    /* Contexto de la sección */
+    .section-context {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        border-left: 4px solid var(--primary-blue-light);
+    }
+
+    .section-title {
+        color: #2c3e50;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .section-description {
+        color: #34495e;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    .section-stats {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .stat {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+
+    .stat strong {
+        color: var(--primary-blue);
+    }
+
+    /* Encabezado de subsecciones */
+    .subsections-header {
+        font-size: 22px;
+        color: var(--primary-blue);
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+
+    /* Tabla de subsecciones */
+    .subsections-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        background-color: white;
+    }
+
+    .subsections-table th, .subsections-table td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    .subsections-table th {
+        background-color: var(--primary-blue);
+        color: white;
+        text-align: center;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .subsections-table tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .subsection-code {
+        font-family: monospace;
+        font-weight: bold;
+        color: var(--primary-blue);
+        text-align: center;
+        width: 120px;
+        font-size: 12px;
+    }
+
+    .subsection-title {
+        font-weight: bold;
+        color: #2c3e50;
+        font-size: 14px;
+        max-width: 200px;
+    }
+
+    .subsection-description {
+        color: #34495e;
+        font-size: 13px;
+        line-height: 1.4;
+        max-width: 300px;
+    }
+
+    .subsection-questions {
+        text-align: center;
+        font-weight: bold;
+        color: #27ae60;
+        width: 80px;
+    }
+
+    .subsection-actions {
+        text-align: center;
+        white-space: nowrap;
+        width: 250px;
+    }
+
+    /* Sin subsecciones */
+    .no-subsections {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        margin-bottom: 25px;
+        border-left: 4px solid #f39c12;
+    }
+
+    .no-subsections h4 {
+        color: #856404;
+        margin-bottom: 15px;
+        font-size: 20px;
+    }
+
+    .no-subsections p {
+        color: #856404;
+        margin: 10px 0;
+        line-height: 1.5;
+    }
+
+    /* Botones */
+    .button {
+        padding: 8px 14px;
+        font-size: 12px;
+        text-decoration: none;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 2px;
+        display: inline-block;
+        font-weight: bold;
+    }
+
+    .view-questions-button {
+        background-color: var(--primary-blue);
+    }
+
+    .view-questions-button:hover {
+        background-color: var(--primary-blue-dark);
+    }
+
+    .edit-button {
+        background-color: var(--primary-blue-light);
+    }
+
+    .edit-button:hover {
+        background-color: var(--primary-blue);
+    }
+
+    .delete-button {
+        background-color: #e74c3c;
+    }
+
+    .delete-button:hover {
+        background-color: #c0392b;
+    }
+
+    .add-subsection-button {
+        background-color: #27ae60;
+        font-size: 16px;
+        padding: 12px 20px;
+    }
+
+    .add-subsection-button:hover {
+        background-color: #1e8449;
+    }
+
+    .back-button {
+        background-color: #34495e;
+        font-size: 16px;
+        padding: 12px 20px;
+    }
+
+    .back-button:hover {
+        background-color: #2c3e50;
+    }
+
+    .admin-button {
+        background-color: #f39c12;
+        font-size: 16px;
+        padding: 12px 20px;
+    }
+
+    .admin-button:hover {
+        background-color: #d68910;
+    }
+
+    .action-buttons {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .action-buttons .button {
+        margin: 0 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .admin-subsections-container {
+            padding: 15px;
+        }
+
+        .subsections-table th, .subsections-table td {
+            font-size: 11px;
+            padding: 6px;
+        }
+
+        .page-title {
+            font-size: 24px;
+        }
+
+        .button {
+            font-size: 10px;
+            padding: 6px 10px;
+        }
+
+        .action-buttons .button {
+            display: block;
+            margin: 5px auto;
+            width: 200px;
+        }
+
+        .section-stats {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+</style>
+
+<script>
+    function confirmSubsectionDeletion(subsectionTitle) {
+        return confirm(`¿Estás seguro de que deseas eliminar la subsección "${subsectionTitle}"?\n\n¡ATENCIÓN! Esta acción también eliminará todas las preguntas asociadas a esta subsección.\n\nEsta acción no se puede deshacer.`);
+    }
+</script>
+{% endblock %} 

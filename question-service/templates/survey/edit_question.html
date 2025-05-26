@@ -1,10 +1,42 @@
 {% extends "base.html" %}
 
 {% block title %}Editar Pregunta{% endblock %}
+{% block logo %}
+<svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Badge outer shape -->
+  <path d="M50 5 C60 5, 70 8, 78 15 C85 20, 90 28, 95 38 C98 45, 98 55, 95 62 C90 72, 85 80, 78 85 C70 92, 60 95, 50 95 C40 95, 30 92, 22 85 C15 80, 10 72, 5 62 C2 55, 2 45, 5 38 C10 28, 15 20, 22 15 C30 8, 40 5, 50 5 Z" 
+        fill="currentColor" opacity="0.9"/>
+  
+  <!-- Inner circle -->
+  <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="3" opacity="0.8"/>
+  
+  <!-- Checkmark -->
+  <path d="M38 50 L45 57 L62 40" fill="none" stroke="currentColor" stroke-width="4" 
+        stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  
+  <!-- Ribbon left -->
+  <path d="M25 75 L35 65 L30 85 L20 90 Z" fill="currentColor" opacity="0.7"/>
+  
+  <!-- Ribbon right -->
+  <path d="M75 75 L65 65 L70 85 L80 90 Z" fill="currentColor" opacity="0.7"/>
+</svg>
+{% endblock %}
+
+{% block header %}SurveySoft Pro{% endblock %}
+
+{% block subtitle %}Sistema de Evaluación ISO 25000{% endblock %}
+
+{% block user_info %}
+<div class="user-avatar">A</div>
+<span>Admin</span>
+{% endblock %}
 
 {% block content %}
 <div class="form-container">
     <h2 class="form-title">Editar Pregunta</h2>
+    <p class="form-info">
+        <strong>Subsección:</strong> {{ question.subsection.subsection_title }} ({{ question.subsection.iso_code }})
+    </p>
     <form method="POST" class="edit-form">
         <div class="form-group">
             <label for="item_name" class="form-label">Nombre de la Pregunta:</label>
@@ -27,64 +59,108 @@
                 placeholder="Escribe la descripción de la pregunta" 
                 required>{{ question.description }}</textarea>
         </div>
+        <div class="form-group">
+            <label class="form-label">Código de la pregunta:</label>
+            <input 
+                type="text" 
+                class="form-input" 
+                value="{{ question.code }}" 
+                readonly
+                style="background-color: #f8f9fa; color: #6c757d;">
+            <small class="form-help">El código se genera automáticamente y no se puede modificar.</small>
+        </div>
         <div class="form-actions">
-            <button type="submit" class="button save-button">Actualizar</button>
-            <a href="{{ url_for('question.administer_survey', survey_id=question.section.survey_id) }}" class="button cancel-button">Cancelar</a>
+            <button type="submit" class="button save-button">✅ Actualizar Pregunta</button>
+            <a href="{{ url_for('question.administer_survey', survey_id=survey_id) }}" class="button cancel-button">❌ Cancelar</a>
         </div>
     </form>
 </div>
 
 <style>
+    /* Variables de color para consistencia */
+    :root {
+        --primary-blue: var(--primary-blue);
+        --primary-blue-dark: var(--primary-blue-dark);
+        --primary-blue-light: var(--primary-blue-light);
+        --primary-blue-lighter: #5dade2;
+        --primary-blue-gradient: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+    }
+
+
     /* Contenedor principal */
     .form-container {
-        max-width: 600px;
+        max-width: 700px;
         margin: 40px auto;
-        padding: 20px;
-        background-color: #f9f9f9;
+        padding: 30px;
+        background-color: #ffffff;
         border: 1px solid #ddd;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     /* Título del formulario */
     .form-title {
-        font-size: 24px;
+        font-size: 28px;
         color: #2c3e50;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         font-family: 'Arial', sans-serif;
+        font-weight: bold;
+    }
+
+    /* Información adicional */
+    .form-info {
+        text-align: center;
+        color: #7f8c8d;
+        margin-bottom: 25px;
+        padding: 10px;
+        background-color: #ecf0f1;
+        border-radius: 6px;
+        font-size: 14px;
     }
 
     /* Estilo de los grupos de formulario */
     .form-group {
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
 
     .form-label {
         display: block;
-        font-size: 14px;
+        font-size: 15px;
         font-weight: bold;
         color: #34495e;
-        margin-bottom: 5px;
+        margin-bottom: 8px;
     }
 
     .form-input, .form-textarea {
         width: 100%;
-        padding: 10px;
+        padding: 12px;
         font-size: 14px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
+        border: 2px solid #bdc3c7;
+        border-radius: 8px;
         box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        box-sizing: border-box;
     }
 
     .form-input:focus, .form-textarea:focus {
-        border-color: #3498db;
+        border-color: var(--primary-blue-light);
         outline: none;
-        box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
     }
 
     .form-textarea {
         resize: vertical;
+        min-height: 100px;
+        font-family: inherit;
+    }
+
+    .form-help {
+        display: block;
+        font-size: 12px;
+        color: #7f8c8d;
+        margin-top: 5px;
+        font-style: italic;
     }
 
     /* Botones */
@@ -92,51 +168,82 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 20px;
+        margin-top: 30px;
+        gap: 15px;
     }
 
     .button {
         text-decoration: none;
-        padding: 10px 20px;
+        padding: 12px 24px;
         font-size: 14px;
         font-weight: bold;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         cursor: pointer;
         color: #fff;
-        transition: background-color 0.3s ease;
+        transition: all 0.3s ease;
+        text-align: center;
+        min-width: 140px;
     }
 
     .save-button {
-        background-color: #2ecc71;
+        background-color: #27ae60;
+        flex: 1;
     }
 
     .save-button:hover {
-        background-color: #27ae60;
+        background-color: #229954;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
     }
 
     .cancel-button {
         background-color: #e74c3c;
-        text-align: center;
+        flex: 1;
     }
 
     .cancel-button:hover {
         background-color: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
     }
 
     /* Responsividad */
     @media (max-width: 768px) {
         .form-container {
-            padding: 15px;
+            margin: 20px;
+            padding: 20px;
         }
 
         .form-title {
-            font-size: 20px;
+            font-size: 24px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            gap: 10px;
         }
 
         .button {
-            padding: 8px 16px;
-            font-size: 12px;
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+        }
+    }
+
+    /* Animaciones */
+    .form-container {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
     }
 </style>

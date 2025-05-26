@@ -9,6 +9,7 @@ class RiskMatrix(Base):
 
     risk_id = Column(Integer, primary_key=True, autoincrement=True)
     software_id = Column(Integer, ForeignKey('evaluation_forms.id'), nullable=False)
+    user_id = Column(Integer, nullable=False)
     description = Column(String(255), nullable=False)
     probability = Column(Enum('Baja', 'Media', 'Alta'), nullable=False)
     impact = Column(Enum('Bajo', 'Medio', 'Alto'), nullable=False)
@@ -18,4 +19,4 @@ class RiskMatrix(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relaciones
-    software = relationship("EvaluationForm")
+    software = relationship("EvaluationForm", back_populates="risks")

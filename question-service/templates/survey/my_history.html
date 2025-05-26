@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Historial de Evaluaciones - ISO 25000</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            margin: 0;
+            padding: 0;
+            color: #212529;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 123, 255, 0.3);
+        }
+
+        .header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-left: 4px solid #007bff;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        /* Flash Messages */
+        .flash-messages {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        /* History Section */
+        .history-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #343a40;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Survey Cards */
+        .survey-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .survey-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .survey-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #007bff;
+        }
+
+        .survey-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .survey-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 0.5rem;
+        }
+
+        .survey-date {
+            font-size: 0.9rem;
+            color: #6c757d;
+            background: #e9ecef;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .survey-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        /* Results Section */
+        .results-section {
+            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .result-item {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+
+        .overall-result {
+            text-align: center;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .result-excelente { background: linear-gradient(135deg, #28a745, #20c997); color: white; }
+        .result-sobresaliente { background: linear-gradient(135deg, #17a2b8, #138496); color: white; }
+        .result-aceptable { background: linear-gradient(135deg, #ffc107, #e0a800); color: white; }
+        .result-insuficiente { background: linear-gradient(135deg, #fd7e14, #e55a00); color: white; }
+        .result-deficiente { background: linear-gradient(135deg, #dc3545, #c82333); color: white; }
+
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #1e7e34, #155724);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #545b62);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #545b62, #3d4449);
+            transform: translateY(-1px);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-description {
+            margin-bottom: 2rem;
+        }
+
+        /* Navigation */
+        .navigation {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #dee2e6;
+        }
+
+        /* Icons */
+        .icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem auto;
+                padding: 0 0.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .survey-info {
+                grid-template-columns: 1fr;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 Mi Historial de Evaluaciones</h1>
+            <p>Evaluaciones ISO 25000 realizadas por {{ username }}</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number">{{ history|length }}</div>
+                <div class="stat-label">Evaluaciones Realizadas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">
+                    {% if history %}
+                        {{ "%.1f"|format(history|map(attribute='percentage')|list|sum / history|length) }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </div>
+                <div class="stat-label">Promedio de Satisfacción</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">
+                    {% set excellent_count = history|selectattr('overall_result', 'equalto', 'Excelente')|list|length %}
+                    {{ excellent_count }}
+                </div>
+                <div class="stat-label">Evaluaciones Excelentes</div>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'error' if category == 'error' else 'info' }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- History Section -->
+        <div class="history-section">
+            <h2 class="section-title">
+                📋 Historial de Evaluaciones
+            </h2>
+
+            {% if history %}
+                <div class="survey-grid">
+                    {% for survey in history %}
+                    <div class="survey-card">
+                        <div class="survey-header">
+                            <div>
+                                <div class="survey-title">{{ survey.survey_name }}</div>
+                                <div class="survey-date">{{ survey.completed_at }}</div>
+                            </div>
+                        </div>
+
+                        <div class="survey-info">
+                            <div class="info-item">
+                                <span class="info-label">Software Evaluado</span>
+                                <span class="info-value">{{ survey.software_name }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Empresa</span>
+                                <span class="info-value">{{ survey.company }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Ciudad</span>
+                                <span class="info-value">{{ survey.city }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Fecha de Evaluación</span>
+                                <span class="info-value">{{ survey.date }}</span>
+                            </div>
+                        </div>
+
+                        <div class="results-section">
+                            <div class="results-grid">
+                                <div class="result-item">
+                                    <div class="result-value">{{ survey.total_score }}</div>
+                                    <div class="result-label">Puntaje Total</div>
+                                </div>
+                                <div class="result-item">
+                                    <div class="result-value">{{ survey.percentage }}%</div>
+                                    <div class="result-label">Porcentaje</div>
+                                </div>
+                                <div class="result-item">
+                                    <div class="result-value">{{ survey.questions_answered }}</div>
+                                    <div class="result-label">Preguntas</div>
+                                </div>
+                            </div>
+                            
+                            <div class="overall-result result-{{ survey.overall_result.lower().replace(' ', '-') }}">
+                                Resultado: {{ survey.overall_result }}
+                            </div>
+                        </div>
+
+                        <div class="actions">
+                            <a href="{{ url_for('history.my_survey_details', survey_id=survey.survey_id) }}" class="btn btn-primary">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
+                                </svg>
+                                Ver Detalles
+                            </a>
+                            <a href="{{ url_for('history.download_my_survey_pdf', survey_id=survey.survey_id) }}" class="btn btn-success">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                                </svg>
+                                Descargar PDF
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <div class="empty-title">No hay evaluaciones realizadas</div>
+                    <div class="empty-description">
+                        Aún no has completado ninguna evaluación ISO 25000.<br>
+                        ¡Comienza tu primera evaluación ahora!
+                    </div>
+                    <a href="{{ url_for('question.formulario') }}" class="btn btn-primary">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                        </svg>
+                        Nueva Evaluación
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <a href="{{ url_for('question.formulario') }}" class="btn btn-primary">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                </svg>
+                Nueva Evaluación
+            </a>
+            <a href="http://localhost:5001/auth/user/dashboard" class="btn btn-secondary">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/>
+                </svg>
+                Volver al Panel
+            </a>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Sección ISO 25000{% endblock %}
+{% block logo %}
+<svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Badge outer shape -->
+  <path d="M50 5 C60 5, 70 8, 78 15 C85 20, 90 28, 95 38 C98 45, 98 55, 95 62 C90 72, 85 80, 78 85 C70 92, 60 95, 50 95 C40 95, 30 92, 22 85 C15 80, 10 72, 5 62 C2 55, 2 45, 5 38 C10 28, 15 20, 22 15 C30 8, 40 5, 50 5 Z" 
+        fill="currentColor" opacity="0.9"/>
+  
+  <!-- Inner circle -->
+  <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="3" opacity="0.8"/>
+  
+  <!-- Checkmark -->
+  <path d="M38 50 L45 57 L62 40" fill="none" stroke="currentColor" stroke-width="4" 
+        stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  
+  <!-- Ribbon left -->
+  <path d="M25 75 L35 65 L30 85 L20 90 Z" fill="currentColor" opacity="0.7"/>
+  
+  <!-- Ribbon right -->
+  <path d="M75 75 L65 65 L70 85 L80 90 Z" fill="currentColor" opacity="0.7"/>
+</svg>
+{% endblock %}
+
+{% block header %}SurveySoft Pro{% endblock %}
+
+{% block subtitle %}Sistema de Evaluación ISO 25000{% endblock %}
+
+{% block user_info %}
+<div class="user-avatar">A</div>
+<span>Admin</span>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2 class="form-title">Editar Sección ISO 25000</h2>
+    
+    <div class="survey-context">
+        <h3>Encuesta: {{ survey.name }}</h3>
+        <p class="survey-description">{{ survey.description }}</p>
+    </div>
+
+    <div class="section-info">
+        <h4>📝 Editando Sección</h4>
+        <p><strong>ID de la Sección:</strong> {{ section.id }}</p>
+        <p><strong>Creada:</strong> {{ section.created_at.strftime('%d/%m/%Y %H:%M') if section.created_at else 'N/A' }}</p>
+        <p><strong>Última Actualización:</strong> {{ section.updated_at.strftime('%d/%m/%Y %H:%M') if section.updated_at else 'N/A' }}</p>
+    </div>
+
+    <form method="POST" class="edit-form">
+        <div class="form-group">
+            <label for="section_title">Título de la Sección:</label>
+            <input type="text" 
+                   name="section_title" 
+                   id="section_title" 
+                   value="{{ section.section_title }}" 
+                   placeholder="Ej: ISO/IEC 2501n: División para el modelo de calidad" 
+                   required>
+            <small class="form-hint">Mantén el formato estándar ISO/IEC seguido de la descripción</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Descripción Detallada:</label>
+            <textarea name="description" 
+                      id="description" 
+                      rows="6" 
+                      placeholder="Describe los objetivos, alcance y componentes de esta división de la norma ISO 25000..." 
+                      required>{{ section.description }}</textarea>
+            <small class="form-hint">Actualiza la descripción manteniendo claridad sobre el propósito y alcance de esta división</small>
+        </div>
+        
+        <div class="warning-box">
+            <h4>⚠️ Importante</h4>
+            <p>Los cambios en esta sección afectarán a todas las encuestas que la utilicen. Asegúrate de que las modificaciones sean correctas antes de guardar.</p>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="button update-button">💾 Actualizar Sección</button>
+            <a href="{{ url_for('question.manage_sections', survey_id=survey.id) }}" 
+               class="button cancel-button">↩️ Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Variables de color para consistencia */
+    :root {
+        --primary-blue: var(--primary-blue);
+        --primary-blue-dark: var(--primary-blue-dark);
+        --primary-blue-light: var(--primary-blue-light);
+        --primary-blue-lighter: #5dade2;
+        --primary-blue-gradient: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+    }
+
+
+    /* Contenedor principal del formulario */
+    .form-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 3px solid #f39c12;
+        padding-bottom: 10px;
+    }
+
+    /* Contexto de la encuesta */
+    .survey-context {
+        background: linear-gradient(135deg, var(--primary-blue-light), var(--primary-blue));
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    .survey-context h3 {
+        margin: 0 0 10px 0;
+        font-size: 20px;
+    }
+
+    .survey-description {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 16px;
+    }
+
+    /* Información de la sección */
+    .section-info {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        border-left: 4px solid #f39c12;
+    }
+
+    .section-info h4 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+
+    .section-info p {
+        color: #34495e;
+        margin: 5px 0;
+        line-height: 1.4;
+    }
+
+    .section-info strong {
+        color: #f39c12;
+    }
+
+    /* Formulario */
+    .edit-form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        font-size: 16px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-group input, .form-group textarea {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 14px;
+        border: 2px solid #bdc3c7;
+        border-radius: 8px;
+        background-color: #ffffff;
+        transition: all 0.3s ease;
+        font-family: Arial, sans-serif;
+    }
+
+    .form-group input:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: #f39c12;
+        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
+    }
+
+    .form-hint {
+        display: block;
+        color: #7f8c8d;
+        font-size: 12px;
+        margin-top: 5px;
+        font-style: italic;
+    }
+
+    /* Caja de advertencia */
+    .warning-box {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border-left: 4px solid #f39c12;
+    }
+
+    .warning-box h4 {
+        color: #856404;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    .warning-box p {
+        color: #856404;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    /* Botones de acción */
+    .form-actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .button {
+        padding: 12px 25px;
+        font-size: 16px;
+        text-decoration: none;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        text-align: center;
+        min-width: 150px;
+    }
+
+    .update-button {
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+    }
+
+    .update-button:hover {
+        background: linear-gradient(135deg, #e67e22, #d35400);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(243, 156, 18, 0.3);
+    }
+
+    .cancel-button {
+        background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    }
+
+    .cancel-button:hover {
+        background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(149, 165, 166, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-container {
+            margin: 20px;
+            padding: 20px;
+        }
+
+        .form-title {
+            font-size: 24px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .button {
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .section-info p {
+            font-size: 14px;
+        }
+
+        .warning-box {
+            padding: 15px;
+        }
+    }
+</style>
+
+<script>
+    // Validación del formulario
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.edit-form');
+        const titleInput = document.getElementById('section_title');
+        const descriptionInput = document.getElementById('description');
+
+        // Guardar valores originales
+        const originalTitle = titleInput.value;
+        const originalDescription = descriptionInput.value;
+
+        form.addEventListener('submit', function(e) {
+            // Verificar si hubo cambios
+            if (titleInput.value === originalTitle && descriptionInput.value === originalDescription) {
+                e.preventDefault();
+                alert('No se han detectado cambios en la sección.');
+                return false;
+            }
+
+            // Validación de longitud
+            if (titleInput.value.trim().length < 10) {
+                e.preventDefault();
+                alert('El título de la sección debe tener al menos 10 caracteres.');
+                titleInput.focus();
+                return false;
+            }
+
+            if (descriptionInput.value.trim().length < 50) {
+                e.preventDefault();
+                alert('La descripción debe tener al menos 50 caracteres para proporcionar información adecuada.');
+                descriptionInput.focus();
+                return false;
+            }
+
+            // Confirmación de cambios
+            const confirmed = confirm('¿Estás seguro de que deseas actualizar esta sección?\n\nLos cambios afectarán a todas las encuestas que utilicen esta sección.');
+            if (!confirmed) {
+                e.preventDefault();
+                return false;
+            }
+
+            return true;
+        });
+    });
+</script>
+{% endblock %} 

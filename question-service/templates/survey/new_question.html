@@ -1,40 +1,101 @@
 {% extends "base.html" %}
 
 {% block title %}Nueva Pregunta{% endblock %}
+{% block logo %}
+<svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Badge outer shape -->
+  <path d="M50 5 C60 5, 70 8, 78 15 C85 20, 90 28, 95 38 C98 45, 98 55, 95 62 C90 72, 85 80, 78 85 C70 92, 60 95, 50 95 C40 95, 30 92, 22 85 C15 80, 10 72, 5 62 C2 55, 2 45, 5 38 C10 28, 15 20, 22 15 C30 8, 40 5, 50 5 Z" 
+        fill="currentColor" opacity="0.9"/>
+  
+  <!-- Inner circle -->
+  <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" stroke-width="3" opacity="0.8"/>
+  
+  <!-- Checkmark -->
+  <path d="M38 50 L45 57 L62 40" fill="none" stroke="currentColor" stroke-width="4" 
+        stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  
+  <!-- Ribbon left -->
+  <path d="M25 75 L35 65 L30 85 L20 90 Z" fill="currentColor" opacity="0.7"/>
+  
+  <!-- Ribbon right -->
+  <path d="M75 75 L65 65 L70 85 L80 90 Z" fill="currentColor" opacity="0.7"/>
+</svg>
+{% endblock %}
+
+{% block header %}SurveySoft Pro{% endblock %}
+
+{% block subtitle %}Sistema de Evaluación ISO 25000{% endblock %}
+
+{% block user_info %}
+<div class="user-avatar">A</div>
+<span>Admin</span>
+{% endblock %}
 
 {% block content %}
 <div class="form-container">
     <h2 class="form-title">Agregar Nueva Pregunta</h2>
+    
+    <div class="iso-info">
+        <h4>📋 Estructura ISO 25000</h4>
+        <p>Las preguntas se asocian a subsecciones específicas (normas ISO) dentro de las divisiones principales de ISO 25000.</p>
+    </div>
+    
     <form method="POST" class="styled-form">
         <div class="form-group">
             <label for="item_name">Nombre de la Pregunta:</label>
             <input type="text" name="item_name" id="item_name" placeholder="Ingresa el nombre de la pregunta" required>
         </div>
+        
         <div class="form-group">
             <label for="description">Descripción:</label>
             <textarea name="description" id="description" rows="4" placeholder="Escribe una descripción para la pregunta" required></textarea>
         </div>
+        
         <div class="form-group">
-            <label for="section_id">Sección:</label>
-            <select name="section_id" id="section_id" required>
-                {% for section in sections %}
-                    <option value="{{ section.id }}">{{ section.section_title }}</option>
+            <label for="subsection_id">Subsección (Norma ISO específica):</label>
+            <select name="subsection_id" id="subsection_id" required>
+                <option value="">Selecciona una norma ISO específica...</option>
+                {% for subsection in subsections %}
+                    <option value="{{ subsection.id }}" 
+                            {% if preselected_subsection_id and preselected_subsection_id|int == subsection.id %}selected{% endif %}
+                            data-section-title="{{ subsection.section.section_title }}"
+                            data-iso-code="{{ subsection.iso_code }}">
+                        {{ subsection.iso_code }} - {{ subsection.subsection_title }}
+                    </option>
                 {% endfor %}
             </select>
+            <div id="subsection-details" class="subsection-details" style="display: none;">
+                <div class="detail-box">
+                    <h5 id="selected-division">División:</h5>
+                    <p id="selected-norm">Norma:</p>
+                    <p id="selected-description">Descripción:</p>
+                </div>
+            </div>
         </div>
+        
         <div class="form-actions">
-            <button type="submit" class="button save-button">Guardar</button>
+            <button type="submit" class="button save-button">Guardar Pregunta</button>
             <a href="{{ url_for('question.administer_survey', survey_id=survey_id) }}" class="button cancel-button">Cancelar</a>
         </div>
     </form>
 </div>
 
 <style>
+    /* Variables de color para consistencia */
+    :root {
+        --primary-blue: var(--primary-blue);
+        --primary-blue-dark: var(--primary-blue-dark);
+        --primary-blue-light: var(--primary-blue-light);
+        --primary-blue-lighter: #5dade2;
+        --primary-blue-gradient: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+    }
+
+
     /* Contenedor principal del formulario */
     .form-container {
-        max-width: 600px;
+        max-width: 700px;
         margin: 40px auto;
-        padding: 20px;
+        padding: 25px;
         background-color: #ffffff;
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -47,6 +108,28 @@
         text-align: center;
         margin-bottom: 20px;
         font-family: 'Arial', sans-serif;
+    }
+
+    /* Información ISO */
+    .iso-info {
+        background-color: #ecf0f1;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        border-left: 4px solid var(--primary-blue-light);
+    }
+
+    .iso-info h4 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    .iso-info p {
+        color: #34495e;
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.4;
     }
 
     .styled-form {
@@ -70,7 +153,7 @@
     .form-group textarea,
     .form-group select {
         width: 100%;
-        padding: 10px;
+        padding: 12px;
         border: 1px solid #ccc;
         border-radius: 6px;
         font-size: 14px;
@@ -82,18 +165,51 @@
     .form-group input:focus,
     .form-group textarea:focus,
     .form-group select:focus {
-        border-color: #2980b9;
-        box-shadow: 0 0 5px rgba(41, 128, 185, 0.5);
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 5px rgba(142, 68, 173, 0.5);
         outline: none;
+    }
+
+    /* Detalles de subsección */
+    .subsection-details {
+        margin-top: 15px;
+        animation: fadeIn 0.3s ease-in;
+    }
+
+    .detail-box {
+        background-color: #f8f9fa;
+        border: 1px solid #8e44ad;
+        border-radius: 8px;
+        padding: 15px;
+    }
+
+    .detail-box h5 {
+        color: var(--primary-blue);
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .detail-box p {
+        color: #34495e;
+        font-size: 13px;
+        margin: 5px 0;
+        line-height: 1.4;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .form-actions {
         display: flex;
         justify-content: space-between;
+        margin-top: 25px;
     }
 
     .button {
-        padding: 10px 20px;
+        padding: 12px 24px;
         font-size: 14px;
         text-align: center;
         border: none;
@@ -107,6 +223,8 @@
 
     .save-button {
         background-color: #27ae60;
+        flex: 1;
+        margin-right: 10px;
     }
 
     .save-button:hover {
@@ -115,6 +233,8 @@
 
     .cancel-button {
         background-color: #e74c3c;
+        flex: 1;
+        margin-left: 10px;
     }
 
     .cancel-button:hover {
@@ -125,6 +245,7 @@
     @media (max-width: 768px) {
         .form-container {
             padding: 15px;
+            margin: 20px 10px;
         }
 
         .form-title {
@@ -133,8 +254,46 @@
 
         .button {
             font-size: 12px;
-            padding: 8px 16px;
+            padding: 10px 16px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .save-button, .cancel-button {
+            margin: 5px 0;
         }
     }
 </style>
+
+<script>
+    // Mostrar detalles de la subsección seleccionada
+    document.getElementById('subsection_id').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const detailsDiv = document.getElementById('subsection-details');
+        
+        if (selectedOption.value) {
+            const sectionTitle = selectedOption.getAttribute('data-section-title');
+            const isoCode = selectedOption.getAttribute('data-iso-code');
+            const subsectionTitle = selectedOption.text.split(' - ')[1];
+            
+            document.getElementById('selected-division').textContent = `División: ${sectionTitle}`;
+            document.getElementById('selected-norm').textContent = `Norma: ${isoCode} - ${subsectionTitle}`;
+            document.getElementById('selected-description').textContent = `Esta pregunta se asociará específicamente a la norma ${isoCode}.`;
+            
+            detailsDiv.style.display = 'block';
+        } else {
+            detailsDiv.style.display = 'none';
+        }
+    });
+
+    // Si hay una subsección preseleccionada, mostrar sus detalles
+    window.addEventListener('load', function() {
+        const selectElement = document.getElementById('subsection_id');
+        if (selectElement.value) {
+            selectElement.dispatchEvent(new Event('change'));
+        }
+    });
+</script>
 {% endblock %}

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta Completada - Evaluación ISO 25000</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+            margin: 0;
+            padding: 0;
+            color: #212529;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+
+        .results-summary {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border-left: 5px solid #28a745;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .result-value {
+            font-weight: 700;
+            color: #28a745;
+            font-size: 1.1rem;
+        }
+
+        .overall-result {
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        .result-excelente {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .result-sobresaliente {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+        }
+
+        .result-aceptable {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: white;
+        }
+
+        .result-insuficiente {
+            background: linear-gradient(135deg, #fd7e14, #e55a00);
+            color: white;
+        }
+
+        .result-deficiente {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .actions {
+            margin-top: 3rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #1e7e34, #155724);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #545b62);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #545b62, #3d4449);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .company-info {
+            background: #e9ecef;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+
+        .company-info h3 {
+            color: #495057;
+            margin-bottom: 1rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            text-align: left;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            color: #495057;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Success Icon -->
+        <div class="success-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+        </div>
+
+        <!-- Title -->
+        <h1>¡Encuesta Completada!</h1>
+        <div class="subtitle">Su evaluación ISO 25000 ha sido procesada exitosamente</div>
+
+        <!-- Company Information -->
+        <div class="company-info">
+            <h3>Información de la Evaluación</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Software Evaluado</span>
+                    <span class="info-value">{{ form_data.software_name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Empresa</span>
+                    <span class="info-value">{{ form_data.company }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Ciudad</span>
+                    <span class="info-value">{{ form_data.city }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Fecha</span>
+                    <span class="info-value">{{ form_data.date }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="results-summary">
+            <h3 style="color: #495057; margin-bottom: 1.5rem;">Resumen de Resultados</h3>
+            
+            <div class="result-item">
+                <span class="result-label">Preguntas Respondidas</span>
+                <span class="result-value">{{ total_responses }}</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Puntaje Obtenido</span>
+                <span class="result-value">{{ total_score|round(0, 'floor')|int }} / {{ max_score }}</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Porcentaje de Satisfacción</span>
+                <span class="result-value">{{ percentage }}%</span>
+            </div>
+        </div>
+
+        <!-- Overall Result -->
+        <div class="overall-result result-{{ overall_result.lower().replace(' ', '-') }}">
+            Resultado General: {{ overall_result }}
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="actions">
+            <a href="{{ url_for('question.download_survey_results_pdf', survey_id=survey_id) }}" class="btn btn-success">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>
+                Descargar Reporte PDF
+            </a>
+            
+            <a href="{{ url_for('history.my_history') }}" class="btn btn-primary">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16.2,16.2L11,13V7H12.5V12.2L17,15.4L16.2,16.2Z"/>
+                </svg>
+                Ver Mi Historial
+            </a>
+            
+            <a href="{{ url_for('question.formulario') }}" class="btn btn-primary">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                </svg>
+                Nueva Evaluación
+            </a>
+            
+            <a href="http://localhost:5001/auth/user/dashboard" class="btn btn-secondary">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/>
+                </svg>
+                Volver al Panel
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #dee2e6; color: #6c757d; font-size: 0.9rem;">
+            <p>Evaluación basada en el estándar ISO/IEC 25000 para la calidad del software</p>
+            <p>&copy; 2024 Sistema de Evaluación ISO 25000. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html> 
