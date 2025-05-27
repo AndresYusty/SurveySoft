@@ -156,6 +156,23 @@
             transform: scale(1.02);
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.getElementById('phone');
+            
+            phoneInput.addEventListener('input', function(e) {
+                // Remove any non-numeric characters
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+            phoneInput.addEventListener('keypress', function(e) {
+                // Prevent non-numeric characters from being typed
+                if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
 </head>
 <body>
     <!-- Header -->
@@ -194,7 +211,7 @@
             <h2>Formulario de Evaluación</h2>
             
             <label for="date">Fecha:</label>
-            <input type="date" id="date" name="date" required>
+            <input type="date" id="date" name="date" value="{{ today_date }}" readonly>
         
             <label for="city">Ciudad:</label>
             <input type="text" id="city" name="city" placeholder="Ingrese la ciudad" required>
@@ -203,7 +220,7 @@
             <input type="text" id="company" name="company" placeholder="Ingrese el nombre de la empresa" required>
         
             <label for="phone">Teléfono:</label>
-            <input type="text" id="phone" name="phone" placeholder="Ingrese el número de teléfono" required>
+            <input type="tel" id="phone" name="phone" placeholder="Ingrese el número de teléfono" pattern="[0-9]*" inputmode="numeric" required>
         
             <label for="software_name">Nombre del Software:</label>
             <input type="text" id="software_name" name="software_name" placeholder="Ingrese el nombre del software" required>

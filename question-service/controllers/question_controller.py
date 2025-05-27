@@ -32,6 +32,7 @@ from sqlalchemy.orm import joinedload
 import time  
 # Importar el nuevo generador de PDFs mejorado
 from utils.pdf_generator import generate_improved_pdf
+from datetime import datetime
 
 
 
@@ -75,7 +76,7 @@ def formulario():
             current_app.logger.error(f"Error al guardar el formulario: {e}")
             flash(f"Error al guardar el formulario: {e}", "error")
 
-    return render_template('question/formulario.html')
+    return render_template('question/formulario.html', today_date=datetime.now().strftime('%Y-%m-%d'))
 
 # Ruta para seleccionar encuesta
 @question_bp.route('/surveys/select', methods=['GET', 'POST'])
